@@ -118,6 +118,7 @@ def main():
         "base_load": model.base_load_report,
         "precomputation_seconds": time.monotonic() - started,
         "optimizer_steps": 0,
+        "vae_cache": model.precompute_vae_stats,
         "training_loads_understanding_branch": False,
     }
     (conditioning / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")

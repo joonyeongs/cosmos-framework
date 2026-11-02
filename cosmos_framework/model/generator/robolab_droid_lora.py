@@ -219,6 +219,8 @@ class CachedDroidLoRAModel(OmniMoTModel):
         self.base_checkpoint_path = str(base_checkpoint)
         self.conditioning_dir = Path(conditioning_dir)
         self.precompute_only = bool(precompute_only)
+        self._precompute_vae_cache = None
+        self.precompute_vae_stats = {"encodes": 0, "cache_hits": 0, "determinism_checks": 0}
         # Idle-frame metadata produces multiple prefixes per task. Keep only
         # two on GPU; the current forward/backward retains its own references.
         self._conditioning = OrderedDict()
@@ -263,6 +265,27 @@ class CachedDroidLoRAModel(OmniMoTModel):
         # The exact Policy-DROID weights were streamed at construction. Do not
         # run the base Nano recipe's understanding-to-generator initialization.
         assert self.base_load_report
+
+    def encode(self, state):
+        if not self.precompute_only:
+            return super().encode(state)
+        # Idle-count prompt variants reuse the same fixed video. Cache only
+        # byte-identical inputs during offline preparation; training (including
+        # its random image augmentation) always runs the native encoder.
+        cached = self._precompute_vae_cache
+        if cached is not None and torch.equal(state, cached[0]):
+            if not cached[2]:
+                repeated = super().encode(state)
+                self.precompute_vae_stats["encodes"] += 1
+                torch.testing.assert_close(repeated, cached[1], rtol=1e-5, atol=1e-6)
+                self.precompute_vae_stats["determinism_checks"] += 1
+                self._precompute_vae_cache = (cached[0], cached[1], True)
+            self.precompute_vae_stats["cache_hits"] += 1
+            return cached[1].clone()
+        encoded = super().encode(state)
+        self.precompute_vae_stats["encodes"] += 1
+        self._precompute_vae_cache = (state.detach().clone(), encoded.detach().clone(), False)
+        return encoded
 
     @torch.no_grad()
     def _validate_pruned_parity(self):
