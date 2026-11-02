@@ -138,7 +138,12 @@ def main():
             "validation_run": str(run),
             "estimated_full_run_seconds": audit["estimated_4000_step_seconds"],
             "steady_optimizer_step_seconds": audit["steady_optimizer_step_seconds"],
-            "gpu_peak_gib_by_rank": audit["gpu_peak_gib_by_rank"],
+            "gpu_peak_gib_by_rank": [
+                [max(first, resumed) for first, resumed in zip(initial_rank, resumed_rank)]
+                for initial_rank, resumed_rank in zip(
+                    audit["gpu_peak_gib_by_rank"], resumed_audit["gpu_peak_gib_by_rank"]
+                )
+            ],
             "full_training_executed": False,
             "continued_existing_validation": bool(previous_audit),
             "final_checks_audit": str(run / "training_audit.json"),

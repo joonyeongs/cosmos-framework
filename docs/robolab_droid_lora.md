@@ -80,6 +80,17 @@ step is excluded from the steady-state estimate. Startup and 16 scheduled
 adapter saves are added. This is a short-run estimate, not a completed full
 training result or an evaluation of the fine-tuned policy's success rate.
 
+The completed validation on 2026-11-02 used two RTX A6000 48 GB GPUs. Both
+64/device × accumulation 1 and 32/device × accumulation 2 ran out of memory.
+**16/device × 2 GPUs × accumulation 4 = global batch 128** completed four
+measured optimizer steps and one restored step. All five video/action adapter
+groups updated, checked frozen weights stayed unchanged, and no understanding
+parameters were loaded. The measured steady step was 353.2 seconds, giving a
+4,000-step estimate of **392.4 hours (16.4 days)**. All 200 successful demos are
+available in both formats. See the
+[completed report](/root/RoboLab/policies/scripted/demos/REPORT.md) for per-task
+counts, collection rates, replay limits, memory, and validation evidence.
+
 ## Ready-to-run full training
 
 Once validation is complete, the user can run:
