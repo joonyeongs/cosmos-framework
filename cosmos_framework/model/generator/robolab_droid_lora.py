@@ -274,7 +274,7 @@ class CachedDroidLoRAModel(OmniMoTModel):
 
     @torch.no_grad()
     def _validate_pruned_parity(self):
-        # This fixture is generated locally by preparation, never downloaded.
+        # This fixture is produced by preparation and may travel with the dataset.
         example_path = self.conditioning_dir / "full_model_parity.pt"
         manifest = json.loads((self.conditioning_dir / "manifest.json").read_text())
         with example_path.open("rb") as f:
