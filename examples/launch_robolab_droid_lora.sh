@@ -43,6 +43,10 @@ done
 if [[ "${1:-}" == "--dryrun" ]]; then
     exec "$PYTHON" -m cosmos_framework.scripts.train --sft-toml examples/toml/sft_config/robolab_droid_lora.toml "${EXTRA_ARGS[@]}" -- "${TAIL_OVERRIDES[@]}"
 fi
+if ! "$PYTHON" -c 'import transformer_engine.pytorch; from cosmos_framework.utils.generator.fused_adam import FusedAdam'; then
+    echo 'Optimizer extension unavailable. Run: .venv/bin/python -m cosmos_framework.scripts.prepare_robolab_optimizer' >&2
+    exit 2
+fi
 "$PYTHON" - "$ROBOLAB_DEMOS" "$COSMOS_DROID_CONDITIONING" <<'PY'
 import json,sys
 from pathlib import Path

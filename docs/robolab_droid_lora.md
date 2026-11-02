@@ -32,6 +32,22 @@ loads the frozen understanding branch once; training removes its modules on
 the meta device before materializing or reading their weights. The tokenizer
 is still used to identify cached prompts.
 
+The installed PyTorch 2.13 environment originally contained a Transformer Engine
+extension built for PyTorch 2.10. Its TE 2.12 framework extension can be rebuilt
+against the installed PyTorch while retaining the bundled CUDA core:
+
+```bash
+.venv/bin/python -m cosmos_framework.scripts.prepare_robolab_optimizer
+```
+
+This helper verifies the pinned official source archive, backs up the original
+extension, and checks a native fused Adam CUDA update with BF16 parameters and
+FP32 master weights. It records the source and binary hashes under
+`training_assets/dependencies/optimizer_extension_repair.json`. Run it again if
+an environment refresh restores the incompatible extension; the launcher checks
+the optimizer import before starting. The build follows NVIDIA's
+[Transformer Engine source-build guidance](https://docs.nvidia.com/deeplearning/transformer-engine/installation.html).
+
 ## Requested batch-size test
 
 After all 200 successful demos have been collected, exported, and conditioned:
