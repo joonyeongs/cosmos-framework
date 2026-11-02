@@ -86,3 +86,5 @@ bash examples/launch_robolab_droid_lora.sh
 Cosmos uses generator video/action LoRA with frozen offline reasoning conditioning. The measured setting is 16/device × two GPUs × accumulation 4 = global batch 128, with 4,000 optimizer steps and an estimated 16.4 days on two A6000s. Hardware changes can change memory limits and timing; batch overrides preserve global batch 128. A clean installation on a second server has not been tested here.
 
 See the included reports and each training repository's documentation for details. No full fine-tuning runs were executed during preparation.
+
+Inherited GitHub Actions workflow files are omitted from this published branch, as authorized, because the publishing token lacks workflow scope. Upstream history and training code are retained.
