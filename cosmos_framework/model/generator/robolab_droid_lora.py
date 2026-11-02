@@ -17,6 +17,7 @@ from safetensors import safe_open
 from safetensors.torch import load_file, save_file
 from torch import nn
 from torch.distributed.tensor import DTensor, distribute_tensor
+from torch.nn import functional as F
 from torch.nn.modules.module import _IncompatibleKeys
 
 from cosmos_framework.model.generator.mot.domain_aware_linear import DomainAwareLinear
@@ -131,6 +132,19 @@ class TextShapeOnly(nn.Module):
         return torch.zeros((*ids.shape, self.hidden_size), dtype=self.dtype_anchor.dtype, device=ids.device)
 
 
+class FrozenFloat32Linear(nn.Linear):
+    """Keep frozen BF16 storage while honoring the native FP32 timestep path."""
+
+    def __init__(self, base):
+        nn.Module.__init__(self)
+        self.in_features, self.out_features = base.in_features, base.out_features
+        self.weight, self.bias = base.weight, base.bias
+        self.requires_grad_(False)
+
+    def forward(self, x):
+        return F.linear(x.float(), self.weight.float(), None if self.bias is None else self.bias.float())
+
+
 def prune_understanding_on_meta(net):
     lm = net.language_model
     if any(p.device.type != "meta" for p in lm.parameters()):
@@ -219,6 +233,11 @@ class CachedDroidLoRAModel(OmniMoTModel):
     def install_attention_dispatch(self, net):
         if not self.precompute_only:
             prune_understanding_on_meta(net)
+        # Native timestep inputs and compute are FP32. A float32 autocast
+        # context does not upcast BF16 parameters, so make that cast explicit
+        # without changing parameter storage, names, or pretrained values.
+        for index in (0, 2):
+            net.time_embedder.mlp[index] = FrozenFloat32Linear(net.time_embedder.mlp[index])
         for name in ("action2llm", "llm2action"):
             base = getattr(net, name)
             if not isinstance(base, DomainAwareLinear):

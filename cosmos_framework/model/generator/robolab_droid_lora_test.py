@@ -2,6 +2,7 @@
 """CPU checks for pretrained action preservation and cached-attention gradients."""
 
 import json
+from copy import deepcopy
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -17,10 +18,12 @@ from cosmos_framework.checkpoint.dcp import ModelWrapper
 from cosmos_framework.model.generator.mot.domain_aware_linear import DomainAwareLinear
 from cosmos_framework.model.generator.mot.inference_text_kv_memory import InferenceTextKVMemoryState, UndKVCache
 from cosmos_framework.model.generator.mot.inference_text_kv_memory_test import _gen_pack
+from cosmos_framework.model.generator.mot.modeling_utils import TimestepEmbedder
 from cosmos_framework.model.generator.mot.unified_mot import Qwen3VLMoTConfig, Qwen3VLTextForCausalLM
 from cosmos_framework.model.generator.robolab_droid_lora import (
     CachedDroidLoRAModel,
     DomainLoRA,
+    FrozenFloat32Linear,
     conditioning_items,
     load_released_weights,
     prune_understanding_on_meta,
@@ -28,6 +31,16 @@ from cosmos_framework.model.generator.robolab_droid_lora import (
 from cosmos_framework.utils.generator.lora import LoraInjectedLinear
 
 pytestmark = [pytest.mark.L0, pytest.mark.CPU]
+
+
+def test_frozen_timestep_embedding_accepts_float32_times_with_bfloat16_storage():
+    embedder = TimestepEmbedder(hidden_size=16).to(torch.bfloat16)
+    reference = deepcopy(embedder).float()
+    for index in (0, 2):
+        embedder.mlp[index] = FrozenFloat32Linear(embedder.mlp[index])
+    times = torch.tensor([0.0, 0.25, 0.75, 1.0], dtype=torch.float32)
+    torch.testing.assert_close(embedder(times), reference(times), rtol=0, atol=0)
+    assert all(parameter.dtype == torch.bfloat16 and not parameter.requires_grad for parameter in embedder.parameters())
 
 
 @pytest.mark.parametrize("shape", [(3, 8), (3, 5, 8)])
