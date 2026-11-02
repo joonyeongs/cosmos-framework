@@ -102,11 +102,13 @@ def main():
         )
         batch = next(iter(packed_loader))
         with torch.no_grad():
-            _, loss = model.training_step(batch, iteration=0)
+            output, loss = model.training_step(batch, iteration=0)
         if not torch.isfinite(loss):
             raise ValueError("Non-finite preparation loss")
         records.append({"prompt": prompt, **model.last_precomputed})
         print("CONDITIONING " + json.dumps(records[-1]), flush=True)
+        # Do not retain a previous prompt's GPU outputs through the next encode.
+        del output, loss, batch, packed_loader, dataloader
     fixture = conditioning / "full_model_parity.pt"
     with fixture.open("rb") as f:
         fixture_hash = hashlib.file_digest(f, "sha256").hexdigest()
