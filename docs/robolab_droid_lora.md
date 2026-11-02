@@ -20,7 +20,9 @@ After collection and export, run from `/root/cosmos-framework`:
 bash examples/prepare_robolab_droid.sh
 ```
 
-Preparation converts the bundled Wan2.2 VAE by a checked key-only mapping and
+Preparation converts the bundled Wan2.2 VAE by a checked key mapping and lossless
+FP32 storage conversion for the native distributed loader (runtime compute
+remains BF16), and
 precomputes text K/V using the released
 `/root/checkpoints/Cosmos3-Nano-Policy-DROID` weights. It covers every task's
 native JSON prompt, all possible idle-frame-count variants, and the null CFG

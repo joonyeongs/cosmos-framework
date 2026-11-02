@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: OpenMDW-1.1
-"""Losslessly rename the bundled Policy-DROID VAE to native training format (CPU)."""
+"""Convert the bundled Policy-DROID VAE losslessly to native training storage."""
 
 import argparse
 import hashlib
@@ -68,7 +68,14 @@ def main():
             value = f.get_tensor(vae_key(key))
             if value.shape != target.shape:
                 raise ValueError(f"VAE shape differs: {key}, {value.shape}, {target.shape}")
-            converted[key] = value
+            # The native loader assigns checkpoint tensors on rank 0 but
+            # materializes default-dtype parameters on the other ranks before
+            # broadcasting. Match those native initialization dtypes exactly.
+            # BF16 -> FP32 storage is lossless; the VAE casts back to BF16 for
+            # computation, preserving the bundled checkpoint's actual values.
+            converted[key] = value.to(dtype=target.dtype)
+            if not torch.equal(converted[key].to(value.dtype), value):
+                raise ValueError(f"Lossy VAE storage conversion: {key}")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     temporary = args.output.with_suffix(".tmp")
     torch.save(converted, temporary)
@@ -77,7 +84,9 @@ def main():
         "source": str(source),
         "source_sha256": hashlib.file_digest(source.open("rb"), "sha256").hexdigest(),
         "tensors": len(converted),
-        "conversion": "Only key renaming; no dtype or tensor changes",
+        "conversion": "Key renaming and lossless storage conversion to native initialization dtypes; runtime VAE compute remains BF16",
+        "storage_dtypes": sorted({str(value.dtype) for value in converted.values()}),
+        "lossless_roundtrip_verified": True,
     }
     args.output.with_suffix(".json").write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps(report))
