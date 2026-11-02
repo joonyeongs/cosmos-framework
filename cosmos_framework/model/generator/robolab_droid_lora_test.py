@@ -7,11 +7,13 @@ from types import SimpleNamespace
 
 import pytest
 import torch
+import torch.distributed.checkpoint as dcp
 from safetensors.torch import save_file
 from torch import nn
 from torch.nn import functional as F
 
 import cosmos_framework.model.generator.mot.inference_text_kv_memory as memory_module
+from cosmos_framework.checkpoint.dcp import ModelWrapper
 from cosmos_framework.model.generator.mot.domain_aware_linear import DomainAwareLinear
 from cosmos_framework.model.generator.mot.inference_text_kv_memory import InferenceTextKVMemoryState, UndKVCache
 from cosmos_framework.model.generator.mot.inference_text_kv_memory_test import _gen_pack
@@ -95,6 +97,26 @@ def test_adapter_state_roundtrip_does_not_overwrite_base():
     torch.testing.assert_close(net.vae2llm.weight, base, rtol=0, atol=0)
     with pytest.raises(ValueError, match="Incomplete adapter checkpoint"):
         CachedDroidLoRAModel._load_net_state_dict(None, net, {})
+
+
+def test_native_dcp_adapter_save_and_restore(tmp_path):
+    # Exercise the framework's real state-dict wrapper without constructing the
+    # multi-billion-parameter model or taking a collection GPU.
+    model = CachedDroidLoRAModel.__new__(CachedDroidLoRAModel)
+    nn.Module.__init__(model)
+    model.config = SimpleNamespace(ema=SimpleNamespace(enabled=False))
+    model.net = nn.Module()
+    model.net.vae2llm = LoraInjectedLinear(nn.Linear(4, 5), rank=2, alpha=4)
+    expected = {name: p.detach().clone() for name, p in model.net.named_parameters()}
+    wrapper = ModelWrapper(model)
+    assert all(".lora_" in name for name in wrapper.state_dict())
+    dcp.save({"model": wrapper}, checkpoint_id=tmp_path / "adapter")
+    with torch.no_grad():
+        model.net.vae2llm.lora_A.weight.fill_(3.0)
+        model.net.vae2llm.lora_B.weight.fill_(4.0)
+    dcp.load({"model": wrapper}, checkpoint_id=tmp_path / "adapter")
+    for name, parameter in model.net.named_parameters():
+        torch.testing.assert_close(parameter, expected[name], rtol=0, atol=0)
 
 
 @pytest.mark.parametrize("num_samples", [1, 2])
