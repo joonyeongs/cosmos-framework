@@ -119,6 +119,8 @@ def get_action_droid_sft_dataset(
     iterable_shuffle: bool = False,
     episode_shuffle_seed: int = 42,
     use_success_only: bool = True,
+    split: str = "train",
+    split_val_ratio: float = 0.03,
 ) -> Dataset:
     """Build the DROID action SFT dataset: ``action_space='joint_pos'`` (8D) +
     ``use_state`` (raw/un-normalized), concat_view, chunk_length 32.
@@ -126,6 +128,8 @@ def get_action_droid_sft_dataset(
     Reads ``root`` (a merged/versioned DROID LeRobot root) as a single flat
     dataset; ``use_success_only=True`` filters to the ``success/`` split."""
     shard_kwargs = dict(
+        split=split,
+        split_val_ratio=split_val_ratio,
         fps=fps,
         chunk_length=chunk_length,
         viewpoint=viewpoint,

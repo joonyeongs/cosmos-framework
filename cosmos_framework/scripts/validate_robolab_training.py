@@ -1,0 +1,113 @@
+# SPDX-License-Identifier: OpenMDW-1.1
+"""Test batch 128, reduce device batch only on OOM, benchmark, and verify resume.
+
+Never launches the full 4,000-step run. Requires all 200 successful demos and
+offline conditioning. Starts with 64 samples/device and one accumulation step.
+"""
+
+import argparse
+import json
+import os
+import shutil
+import subprocess
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--demos", type=Path, default=Path("/root/RoboLab/output/cosmos3_droid_demos"))
+    parser.add_argument("--steps", type=int, default=4)
+    args = parser.parse_args()
+    if not 3 <= args.steps <= 8:
+        parser.error("Validation must use 3–8 optimizer steps, never the full run")
+    repo = Path(__file__).resolve().parents[2]
+    provenance = json.loads((args.demos / "train_ready/provenance.json").read_text())
+    if len(provenance["counts"]) != 8 or set(provenance["counts"].values()) != {25}:
+        raise ValueError("Wait until all 200 successful demos have been exported")
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    logs = args.demos / "logs"
+    assets = args.demos / "training_assets"
+    logs.mkdir(parents=True, exist_ok=True)
+    assets.mkdir(parents=True, exist_ok=True)
+    attempts = []
+    for per_device in (64, 32, 16, 8, 4, 2, 1):
+        accumulation = 64 // per_device
+        name = f"validation_{stamp}_b{per_device}_a{accumulation}"
+        log_path = logs / f"{name}.log"
+        environment = dict(os.environ, ROBOLAB_DEMOS=str(args.demos), COSMOS_DROID_PER_DEVICE_BATCH=str(per_device))
+        command = [
+            "bash",
+            str(repo / "examples/launch_robolab_droid_lora.sh"),
+            "--",
+            f"job.name={name}",
+            f"trainer.max_iter={args.steps}",
+            "checkpoint.save_iter=2",
+        ]
+        started = time.monotonic()
+        print(f"TEST per_device={per_device} accumulation={accumulation} global_batch=128 log={log_path}", flush=True)
+        with log_path.open("w") as stream:
+            result = subprocess.run(command, cwd=repo, env=environment, stdout=stream, stderr=subprocess.STDOUT)
+        record = {
+            "per_device_batch_size": per_device,
+            "gradient_accumulation_steps": accumulation,
+            "returncode": result.returncode,
+            "log": str(log_path),
+            "wall_seconds": time.monotonic() - started,
+        }
+        attempts.append(record)
+        (assets / "batch128_attempts.json").write_text(json.dumps(attempts, indent=2) + "\n")
+        if result.returncode:
+            message = log_path.read_text(errors="replace").lower()
+            if (
+                "outofmemoryerror" not in message
+                and "cuda out of memory" not in message
+                and "cuda error: out of memory" not in message
+            ):
+                raise RuntimeError(f"Non-memory training failure; fix it before continuing: {log_path}")
+            record["out_of_memory"] = True
+            (assets / "batch128_attempts.json").write_text(json.dumps(attempts, indent=2) + "\n")
+            print("OOM: halving device batch and doubling accumulation", flush=True)
+            continue
+        output_root = Path(environment.get("IMAGINAIRE_OUTPUT_ROOT", args.demos / "training_runs"))
+        run = output_root / "robolab/cosmos3_droid_lora" / name
+        audit = json.loads((run / "training_audit.json").read_text())
+        assert audit["effective_batch_size"] == 128
+        assert audit["completed_optimizer_steps_this_run"] == args.steps
+        assert audit["frozen_weight_checks_passed"] and not audit["reasoning_parameters_present"]
+        shutil.copy2(run / "training_audit.json", run / "training_audit_initial.json")
+        # A single resumed optimizer step verifies adapter and optimizer restoration.
+        resume_log = logs / f"{name}_resume.log"
+        command[-2] = f"trainer.max_iter={args.steps + 1}"
+        with resume_log.open("w") as stream:
+            resumed = subprocess.run(command, cwd=repo, env=environment, stdout=stream, stderr=subprocess.STDOUT)
+        if resumed.returncode:
+            raise RuntimeError(f"Checkpoint resume failed: {resume_log}")
+        resumed_audit = json.loads((run / "training_audit.json").read_text())
+        assert resumed_audit["resumed_at_iteration"] == args.steps
+        assert resumed_audit["completed_optimizer_steps_this_run"] == 1
+        assert resumed_audit["frozen_weight_checks_passed"]
+        selection = {
+            "global_batch_size": 128,
+            "per_device_batch_size": per_device,
+            "gradient_accumulation_steps": accumulation,
+            "gpus": 2,
+            "optimizer_steps": 4000,
+            "memory_trials": attempts,
+            "validated_optimizer_steps": args.steps + 1,
+            "checkpoint_resume_passed": True,
+            "validation_run": str(run),
+            "estimated_full_run_seconds": audit["estimated_4000_step_seconds"],
+            "steady_optimizer_step_seconds": audit["steady_optimizer_step_seconds"],
+            "gpu_peak_gib_by_rank": audit["gpu_peak_gib_by_rank"],
+            "full_training_executed": False,
+        }
+        (assets / "batch128.json").write_text(json.dumps(selection, indent=2) + "\n")
+        print(json.dumps(selection, indent=2), flush=True)
+        return
+    raise RuntimeError("Even one sample/device ran out of memory; inspect the final log")
+
+
+if __name__ == "__main__":
+    main()
