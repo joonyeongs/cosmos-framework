@@ -157,13 +157,18 @@ class RoboLabTrainingAudit(Callback):
         ]
         if self.steps and not changed:
             raise AssertionError("No adapter updated")
+        # A can change from weight decay alone. B starts at zero, so require
+        # updates to B in every video/action group as evidence of loss gradients.
+        updated_groups = {}
         for part in ("action2llm", "llm2action", "vae2llm", "llm2vae", "moe_gen"):
-            if self.steps and not any(part in name for name in changed):
-                raise AssertionError(f"No update reached {part} adapters")
+            updated_groups[part] = [name for name in changed if part in name and ".lora_B." in name]
+            if self.steps and not updated_groups[part]:
+                raise AssertionError(f"No loss-gradient update reached {part} B adapters")
         self.report.update(
             {
                 "frozen_weight_checks_passed": True,
                 "changed_adapters": changed,
+                "adapter_loss_gradient_checks": updated_groups,
                 "completed_optimizer_steps_this_run": len(self.steps),
             }
         )
