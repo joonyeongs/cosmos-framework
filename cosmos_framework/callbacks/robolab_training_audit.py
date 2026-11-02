@@ -147,14 +147,21 @@ class RoboLabTrainingAudit(Callback):
             tmp.replace(self.path)
 
     def on_train_end(self, model, iteration=0):
-        for name, param in model.net.named_parameters():
-            if name in self.base_hashes and digest(param) != self.base_hashes[name]:
-                raise AssertionError(f"Frozen base weight changed: {name}")
-        changed = [
-            name
-            for name, param in model.net.named_parameters()
-            if name in self.adapter_hashes and digest(param) != self.adapter_hashes[name]
-        ]
+        parameters = dict(model.net.named_parameters())
+        frozen_names, adapter_names = sorted(self.base_hashes), sorted(self.adapter_hashes)
+        local_changes = [digest(parameters[name]) != self.base_hashes[name] for name in frozen_names]
+        local_changes += [digest(parameters[name]) != self.adapter_hashes[name] for name in adapter_names]
+        changes = torch.tensor(local_changes, dtype=torch.int32, device=parameters[adapter_names[0]].device)
+        # FSDP shards can contain only unused, padded action output dimensions.
+        # Require updates to the global parameter, not to every local shard.
+        # Aggregate frozen-weight failures too, so all ranks follow the same path.
+        if dist.is_initialized():
+            dist.all_reduce(changes, op=dist.ReduceOp.MAX)
+        changes = changes.cpu().tolist()
+        changed_frozen = [name for name, changed in zip(frozen_names, changes) if changed]
+        if changed_frozen:
+            raise AssertionError(f"Frozen base weights changed: {changed_frozen}")
+        changed = [name for name, changed in zip(adapter_names, changes[len(frozen_names) :]) if changed]
         if self.steps and not changed:
             raise AssertionError("No adapter updated")
         # A can change from weight decay alone. B starts at zero, so require
@@ -169,6 +176,7 @@ class RoboLabTrainingAudit(Callback):
                 "frozen_weight_checks_passed": True,
                 "changed_adapters": changed,
                 "adapter_loss_gradient_checks": updated_groups,
+                "parameter_check_scope": "global union of all distributed parameter shards",
                 "completed_optimizer_steps_this_run": len(self.steps),
             }
         )

@@ -6,9 +6,10 @@ one shared adapter, and no held-out validation. Both repositories use branch
 
 ## Data and preparation
 
-Original HDF5 episodes and three 640×360, 15 Hz camera videos live under
-`/root/RoboLab/output/cosmos3_droid_demos/original`. The exported LeRobot v3 root
-is `train_ready/droid_plus_lerobot_640x360_20260412/success` beneath that directory.
+The dataset root is `/root/RoboLab/output/cosmos3_droid_demos`. Original HDF5
+episodes and three 640×360, 15 Hz camera videos live under its `original/`
+directory. The exported LeRobot v3 root is
+`train_ready/droid_plus_lerobot_640x360_20260412/success` beneath the dataset root.
 The native DROID loader reads raw absolute joint actions and robot state, and
 composes wrist/left/right views. The original crop/rescale and ColorJitter
 augmentation remain enabled. All 200 episodes participate in training; the
@@ -62,6 +63,14 @@ then 1×64 per GPU. Every setting has global batch 128. Other errors stop the
 sweep for investigation. The first fitting setting runs four optimizer steps,
 saves adapter checkpoints, and resumes for one further step. It does not run
 the full 4,000-step job.
+
+If a validation is interrupted after its four measured steps and final
+checkpoint exist, `--resume-validation-run <absolute-run-directory>` preserves
+those measurements and finishes the one-step resume check. Original failure
+logs remain intact. The final audit checks updates across the union of FSDP
+shards: DROID uses eight of the model's 64 action output dimensions, so a shard
+containing only padded dimensions legitimately has no action-output update.
+Frozen-weight changes on either rank still fail the check on both ranks.
 
 `training_assets/batch128.json` is written only after the test and resume pass.
 It records the selected batch/accumulation, GPU memory, log paths, measured
