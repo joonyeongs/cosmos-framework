@@ -15,8 +15,14 @@ precision = "bfloat16"
 data_parallel_shard_degree = 2
 data_parallel_replicate_degree = 1
 
+# Selective AC + compile: see robolab_droid_edge_lora.toml for the rationale and
+# measurements. save_ops_regex stays unset so the framework default (all
+# attention backends) applies.
 [model.activation_checkpointing]
-mode = "full"
+mode = "selective"
+
+[model.compile]
+enabled = true
 
 [model.tokenizer]
 vae_path = "${oc.env:WAN_VAE_PATH}"
@@ -24,15 +30,21 @@ vae_path = "${oc.env:WAN_VAE_PATH}"
 [optimizer]
 lr = 0.0001
 
+# 2,000 optimizer steps: 100-step linear warmup (f_start -> f_max = 1.0, i.e. lr 1e-4),
+# then linear decay to 0 at step 2,000. cycle_lengths includes the warmup steps.
 [scheduler]
-cycle_lengths = [4000]
+cycle_lengths = [2000]
+warm_up_steps = [100]
+f_start = [1.0e-6]
+f_max = [1.0]
+f_min = [0.0]
 
 [dataloader_train]
 max_samples_per_batch = 32
 
 [trainer]
-max_iter = 4000
-grad_accum_iter = 2
+max_iter = 2000
+grad_accum_iter = 1  # global batch 64 = 32/GPU x 2 GPUs x 1
 logging_iter = 1
 
 [checkpoint]

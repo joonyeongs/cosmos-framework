@@ -9,6 +9,7 @@ Only the offline preparation process constructs the full text pathway.
 import hashlib
 import json
 import math
+import os
 from collections import OrderedDict, defaultdict
 from pathlib import Path
 
@@ -133,16 +134,39 @@ class TextShapeOnly(nn.Module):
 
 
 class FrozenFloat32Linear(nn.Linear):
-    """Keep frozen BF16 storage while honoring the native FP32 timestep path."""
+    """Keep BF16 storage while honoring the native FP32 timestep path.
 
-    def __init__(self, base):
+    Frozen for adapter training; ``trainable=True`` keeps gradients (the FP32
+    cast is differentiable) for generator full fine-tuning.
+    """
+
+    def __init__(self, base, trainable=False):
         nn.Module.__init__(self)
         self.in_features, self.out_features = base.in_features, base.out_features
         self.weight, self.bias = base.weight, base.bias
-        self.requires_grad_(False)
+        if not trainable:
+            self.requires_grad_(False)
 
     def forward(self, x):
         return F.linear(x.float(), self.weight.float(), None if self.bias is None else self.bias.float())
+
+
+# Generator full fine-tuning trains every surviving generator-side weight except
+# ``k_norm_und_for_gen``: that norm is already baked into the cached text keys,
+# so updating it would silently desynchronize the cache.
+FULL_FINETUNE_KEYS = (
+    "moe_gen",
+    "time_embedder",
+    "vae2llm",
+    "llm2vae",
+    "action2llm",
+    "llm2action",
+    "action_modality_embed",
+)
+
+
+def is_full_finetune_parameter(name):
+    return any(key in name for key in FULL_FINETUNE_KEYS) and ".k_norm_und_for_gen." not in name
 
 
 def is_generator_language_parameter(name):
@@ -221,7 +245,10 @@ def conditioning_key(packed):
 
 
 class CachedDroidLoRAModel(OmniMoTModel):
-    def __init__(self, config, base_checkpoint, conditioning_dir, precompute_only=False):
+    def __init__(self, config, base_checkpoint, conditioning_dir, precompute_only=False, full_finetune=False):
+        self.full_finetune = bool(full_finetune)
+        if self.full_finetune and config.lora_enabled:
+            raise ValueError("Generator full fine-tuning requires lora_enabled=False")
         self.base_checkpoint_path = str(base_checkpoint)
         self.conditioning_dir = Path(conditioning_dir)
         self.precompute_only = bool(precompute_only)
@@ -233,7 +260,10 @@ class CachedDroidLoRAModel(OmniMoTModel):
             raise ValueError("This adapter recipe requires EMA disabled")
         super().__init__(config)
         self.base_load_report = load_released_weights(self.net, self.base_checkpoint_path)
-        self._assert_adapter_scope()
+        if self.full_finetune:
+            self._select_full_finetune_parameters()
+        else:
+            self._assert_adapter_scope()
         if not self.precompute_only:
             self._validate_pruned_parity()
 
@@ -244,7 +274,13 @@ class CachedDroidLoRAModel(OmniMoTModel):
         # context does not upcast BF16 parameters, so make that cast explicit
         # without changing parameter storage, names, or pretrained values.
         for index in (0, 2):
-            net.time_embedder.mlp[index] = FrozenFloat32Linear(net.time_embedder.mlp[index])
+            net.time_embedder.mlp[index] = FrozenFloat32Linear(
+                net.time_embedder.mlp[index], trainable=self.full_finetune
+            )
+        if self.full_finetune:
+            # Train the pretrained domain-aware action boundaries directly.
+            install_inference_memory_attention_dispatch(net)
+            return
         for name in ("action2llm", "llm2action"):
             base = getattr(net, name)
             if not isinstance(base, DomainAwareLinear):
@@ -265,6 +301,18 @@ class CachedDroidLoRAModel(OmniMoTModel):
         for part in ("action2llm", "llm2action", "vae2llm", "llm2vae", "moe_gen"):
             if not any(part in name for name in names):
                 raise ValueError(f"Missing {part} adapters")
+
+    def _select_full_finetune_parameters(self):
+        trainable = []
+        for name, param in self.net.named_parameters():
+            param.requires_grad_(is_full_finetune_parameter(name))
+            if param.requires_grad:
+                trainable.append(name)
+        if any(".lora_" in name for name in trainable):
+            raise ValueError("Adapters present in generator full fine-tuning")
+        for part in ("action2llm", "llm2action", "vae2llm", "llm2vae", "moe_gen", "time_embedder"):
+            if not any(part in name for name in trainable):
+                raise ValueError(f"Missing trainable {part} parameters")
 
     def load_pretrained_model_if_needed(self, **kwargs):
         # The exact Policy-DROID weights were streamed at construction. Do not
@@ -291,14 +339,37 @@ class CachedDroidLoRAModel(OmniMoTModel):
         packed.to_cuda()
         memory = self.build_memory_state(packed, {})
         actual = self.net(packed_seq=packed, memory=memory)
+        # The fixture is hardware/software specific (produced on the preparation
+        # machine). COSMOS_DROID_PARITY_MODE=report logs the drift instead of
+        # aborting, for running on a different GPU/PyTorch stack. Default: strict.
+        mode = os.environ.get("COSMOS_DROID_PARITY_MODE", "strict")
+        if mode not in ("strict", "report"):
+            raise ValueError(f"COSMOS_DROID_PARITY_MODE must be strict or report, got {mode}")
         self.parity_report = {}
+        self.parity_stats = {}
         for name in ("preds_vision", "preds_action"):
             errors = []
+            stats = []
             for reference, prediction in zip(example["predictions"][name], actual[name]):
                 reference = reference.to(prediction.device)
-                torch.testing.assert_close(prediction, reference, rtol=0.02, atol=0.02)
-                errors.append(float((prediction.float() - reference.float()).abs().max()))
+                p, r = prediction.float().flatten(), reference.float().flatten()
+                diff = (p - r).abs()
+                stats.append(
+                    {
+                        "max_abs": float(diff.max()),
+                        "mean_abs": float(diff.mean()),
+                        "rel_l2": float((p - r).norm() / r.norm().clamp_min(1e-12)),
+                        "cosine": float(F.cosine_similarity(p, r, dim=0)),
+                        "out_of_tol_frac": float((diff > 0.02 + 0.02 * r.abs()).float().mean()),
+                        "ref_abs_mean": float(r.abs().mean()),
+                    }
+                )
+                print(f"[robolab parity] {name}: {stats[-1]}", flush=True)
+                if mode == "strict":
+                    torch.testing.assert_close(prediction, reference, rtol=0.02, atol=0.02)
+                errors.append(stats[-1]["max_abs"])
             self.parity_report[name] = errors
+            self.parity_stats[name] = stats
 
     def build_memory_state(self, packed_seq, memory_info):
         if self.precompute_only:
@@ -384,17 +455,23 @@ class CachedDroidLoRAModel(OmniMoTModel):
             self.last_precomputed = {"key": key, "parity_max_abs": parity, "text_tokens": len(ids)}
         return out
 
+    def _is_trained_key(self, key):
+        return is_full_finetune_parameter(key) if self.full_finetune else ".lora_" in key
+
     def _net_state_dict(self, net, prefix="", keep_vars=False):
-        # DCP saves adapters and optimizer state, avoiding 16 copies of frozen weights.
+        # DCP saves trained weights (adapters, or the fine-tuned generator) and
+        # optimizer state; frozen weights always come from the released checkpoint.
         return {
-            key: value for key, value in net.state_dict(prefix=prefix, keep_vars=keep_vars).items() if ".lora_" in key
+            key: value
+            for key, value in net.state_dict(prefix=prefix, keep_vars=keep_vars).items()
+            if self._is_trained_key(key)
         }
 
     def _load_net_state_dict(self, net, state_dict):
-        if any(".lora_" not in key for key in state_dict):
-            raise ValueError("Only adapter checkpoints may resume this recipe")
+        if any(not self._is_trained_key(key) for key in state_dict):
+            raise ValueError("Checkpoint holds weights this recipe does not train; refusing to resume")
         result = net.load_state_dict(state_dict, strict=False)
-        missing = [key for key in result.missing_keys if ".lora_" in key]
+        missing = [key for key in result.missing_keys if self._is_trained_key(key)]
         if missing or result.unexpected_keys:
-            raise ValueError(f"Incomplete adapter checkpoint: {missing}, {result.unexpected_keys}")
+            raise ValueError(f"Incomplete checkpoint: {missing}, {result.unexpected_keys}")
         return _IncompatibleKeys([], [])

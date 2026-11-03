@@ -1,5 +1,9 @@
 # SPDX-License-Identifier: OpenMDW-1.1
-"""Measure real optimizer-step throughput and verify adapter-only updates."""
+"""Measure real optimizer-step throughput and verify that only the trained weights change.
+
+Adapter (LoRA) runs track the pretrained boundary weights as frozen; generator full
+fine-tuning runs track every parameter left frozen (``model.full_finetune``).
+"""
 
 import hashlib
 import json
@@ -35,13 +39,19 @@ class RoboLabTrainingAudit(Callback):
         self.previous_optimizer_end = self.started
         self.startup_s = time.time() - float(os.environ.get("COSMOS_RUN_STARTED_AT", time.time()))
         self.starts, self.steps, self.saves, self.samples = {}, [], [], {}
-        self.base_hashes = {
-            name: digest(param)
-            for name, param in model.net.named_parameters()
-            if name in ("action2llm.fc.weight", "llm2action.fc.weight", "vae2llm.weight", "llm2vae.weight")
-        }
-        if len(self.base_hashes) != 4:
-            raise AssertionError(f"Could not locate all frozen boundary weights: {list(self.base_hashes)}")
+        self.full_finetune = bool(getattr(model, "full_finetune", False))
+        if self.full_finetune:
+            self.base_hashes = {
+                name: digest(param) for name, param in model.net.named_parameters() if not param.requires_grad
+            }
+        else:
+            self.base_hashes = {
+                name: digest(param)
+                for name, param in model.net.named_parameters()
+                if name in ("action2llm.fc.weight", "llm2action.fc.weight", "vae2llm.weight", "llm2vae.weight")
+            }
+            if len(self.base_hashes) != 4:
+                raise AssertionError(f"Could not locate all frozen boundary weights: {list(self.base_hashes)}")
         self.adapter_hashes = {
             name: digest(param) for name, param in model.net.named_parameters() if param.requires_grad
         }
@@ -62,8 +72,12 @@ class RoboLabTrainingAudit(Callback):
             * self.config.trainer.grad_accum_iter
             * self.config.dataloader_train.max_samples_per_batch,
             "base_load": model.base_load_report,
+            "training_mode": "generator_full_finetune" if self.full_finetune else "lora",
             "trainable_names": sorted(self.adapter_hashes),
+            "trainable_elements": sum(p.numel() for n, p in model.net.named_parameters() if n in self.adapter_hashes),
             "pruned_vs_full_model_parity": model.parity_report,
+            "pruned_vs_full_model_parity_stats": getattr(model, "parity_stats", None),
+            "parity_mode": os.environ.get("COSMOS_DROID_PARITY_MODE", "strict"),
             "reasoning_parameters_present": [
                 n for n, _ in model.net.language_model.named_parameters() if not is_generator_language_parameter(n)
             ],
@@ -108,8 +122,11 @@ class RoboLabTrainingAudit(Callback):
         elapsed = now - self.previous_optimizer_end
         self.previous_optimizer_end = now
         actual_global = self.samples.pop(iteration - 1) * self.world_size
-        if actual_global != 128:
-            raise AssertionError(f"Expected global batch 128, observed {actual_global}")
+        expected_global = (
+            self.world_size * self.config.trainer.grad_accum_iter * self.config.dataloader_train.max_samples_per_batch
+        )
+        if actual_global != expected_global:
+            raise AssertionError(f"Expected global batch {expected_global}, observed {actual_global}")
         if not torch.isfinite(loss).all():
             raise AssertionError("Non-finite training loss")
         wall = torch.tensor(elapsed, dtype=torch.float64, device="cuda")
@@ -151,12 +168,17 @@ class RoboLabTrainingAudit(Callback):
         )
         if steady:
             step_median = statistics.median(steady)
+            # Project the configured recipe (trainer.max_iter / checkpoint.save_iter),
+            # not the shortened debug run that measured it.
+            run_steps = int(os.environ.get("COSMOS_DROID_RECIPE_STEPS", self.config.trainer.max_iter))
+            run_saves = run_steps // max(1, int(self.config.checkpoint.save_iter))
             self.report.update(
                 {
                     "steady_optimizer_step_seconds": step_median,
-                    "estimated_4000_step_seconds": self.startup_s + 4000 * step_median + 16 * save_median,
+                    "estimated_run_steps": run_steps,
+                    "estimated_run_seconds": self.startup_s + run_steps * step_median + run_saves * save_median,
                     "observed_optimizer_step_seconds_range": [min(steady), max(steady)],
-                    "estimate_basis": "Measured two-GPU optimizer steps, including all gradient accumulation; first step excluded; startup plus 16 adapter saves added",
+                    "estimate_basis": f"Measured two-GPU optimizer steps, including all gradient accumulation; first step excluded; startup plus {run_saves} checkpoint saves added",
                 }
             )
         if self.rank == 0:
@@ -182,14 +204,17 @@ class RoboLabTrainingAudit(Callback):
             raise AssertionError(f"Frozen base weights changed: {changed_frozen}")
         changed = [name for name, changed in zip(adapter_names, changes[len(frozen_names) :]) if changed]
         if self.steps and not changed:
-            raise AssertionError("No adapter updated")
-        # A can change from weight decay alone. B starts at zero, so require
+            raise AssertionError("No trainable weight updated")
+        # LoRA: A can change from weight decay alone. B starts at zero, so require
         # updates to B in every video/action group as evidence of loss gradients.
+        # Full fine-tuning: require an update in every group.
         updated_groups = {}
         for part in ("action2llm", "llm2action", "vae2llm", "llm2vae", "moe_gen"):
-            updated_groups[part] = [name for name in changed if part in name and ".lora_B." in name]
+            updated_groups[part] = [
+                name for name in changed if part in name and (self.full_finetune or ".lora_B." in name)
+            ]
             if self.steps and not updated_groups[part]:
-                raise AssertionError(f"No loss-gradient update reached {part} B adapters")
+                raise AssertionError(f"No loss-gradient update reached {part} trainable weights")
         self.report.update(
             {
                 "frozen_weight_checks_passed": True,
