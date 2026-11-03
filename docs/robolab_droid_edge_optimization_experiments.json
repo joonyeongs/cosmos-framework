@@ -1,0 +1,1326 @@
+{
+  "edge_vae_candidates": [
+    {
+      "chunk": 24,
+      "batch": 1,
+      "seconds_per_clip": 0.7521508098579943,
+      "seconds_for_four": [
+        3.003935160115361,
+        3.0086032394319773,
+        3.011883834376931
+      ],
+      "peak_allocated_gib": 6.474520206451416,
+      "parity": {
+        "max_abs": 0.0,
+        "rmse": 0.0,
+        "relative_rmse": 0.0,
+        "reference_rms": 0.879259467124939
+      }
+    },
+    {
+      "chunk": 24,
+      "batch": 2,
+      "seconds_per_clip": 0.7468466539867222,
+      "seconds_for_four": [
+        2.987386615946889,
+        2.9889718499034643,
+        2.9783576130867004
+      ],
+      "peak_allocated_gib": 10.993979454040527,
+      "parity": {
+        "max_abs": 0.046875,
+        "rmse": 0.003241392085328698,
+        "relative_rmse": 0.0036865021102130413,
+        "reference_rms": 0.879259467124939
+      }
+    },
+    {
+      "chunk": 24,
+      "batch": 4,
+      "seconds_per_clip": 0.7480096593499184,
+      "seconds_for_four": [
+        2.9889702890068293,
+        2.9920386373996735,
+        2.998727634549141
+      ],
+      "peak_allocated_gib": 20.03719425201416,
+      "parity": {
+        "max_abs": 0.046875,
+        "rmse": 0.0032187621109187603,
+        "relative_rmse": 0.003660764778032899,
+        "reference_rms": 0.879259467124939
+      }
+    },
+    {
+      "chunk": 32,
+      "batch": 1,
+      "seconds_per_clip": 0.7484661415219307,
+      "seconds_for_four": [
+        2.9965112283825874,
+        2.993864566087723,
+        2.993276523426175
+      ],
+      "peak_allocated_gib": 7.747237205505371,
+      "parity": {
+        "max_abs": 0.046875,
+        "rmse": 0.0029763905331492424,
+        "relative_rmse": 0.0033851105254143476,
+        "reference_rms": 0.879259467124939
+      }
+    },
+    {
+      "chunk": 32,
+      "batch": 2,
+      "seconds_per_clip": 0.7470425344072282,
+      "seconds_for_four": [
+        2.988170137628913,
+        2.987727852538228,
+        2.9962439108639956
+      ],
+      "peak_allocated_gib": 13.54394006729126,
+      "parity": {
+        "max_abs": 0.046875,
+        "rmse": 0.0032369212713092566,
+        "relative_rmse": 0.003681417554616928,
+        "reference_rms": 0.879259467124939
+      }
+    },
+    {
+      "chunk": 32,
+      "batch": 4,
+      "seconds_per_clip": 0.7561379321850836,
+      "seconds_for_four": [
+        3.0177430026233196,
+        3.030047131702304,
+        3.0245517287403345
+      ],
+      "peak_allocated_gib": 25.13356876373291,
+      "parity": {
+        "max_abs": 0.046875,
+        "rmse": 0.003217437770217657,
+        "relative_rmse": 0.003659258596599102,
+        "reference_rms": 0.879259467124939
+      }
+    },
+    {
+      "chunk": 16,
+      "batch": 1,
+      "seconds_per_clip": 0.7655167300254107,
+      "seconds_for_four": [
+        3.063179785385728,
+        3.0620669201016426,
+        3.0618739500641823
+      ],
+      "peak_allocated_gib": 5.444170951843262,
+      "parity": {
+        "max_abs": 0.046875,
+        "rmse": 0.003483601612970233,
+        "relative_rmse": 0.003961972426623106,
+        "reference_rms": 0.879259467124939
+      }
+    },
+    {
+      "chunk": 16,
+      "batch": 2,
+      "seconds_per_clip": 0.7533908146433532,
+      "seconds_for_four": [
+        3.010948544368148,
+        3.013563258573413,
+        3.0151824299246073
+      ],
+      "peak_allocated_gib": 8.94091272354126,
+      "parity": {
+        "max_abs": 0.046875,
+        "rmse": 0.0032341405749320984,
+        "relative_rmse": 0.0036782550159841776,
+        "reference_rms": 0.879259467124939
+      }
+    },
+    {
+      "chunk": 16,
+      "batch": 4,
+      "seconds_per_clip": 0.7485531107522547,
+      "seconds_for_four": [
+        2.9934472925961018,
+        2.994212443009019,
+        2.996789528056979
+      ],
+      "peak_allocated_gib": 15.934353828430176,
+      "parity": {
+        "max_abs": 0.0625,
+        "rmse": 0.0032522138208150864,
+        "relative_rmse": 0.003698810236528516,
+        "reference_rms": 0.879259467124939
+      }
+    },
+    {
+      "chunk": 8,
+      "batch": 1,
+      "seconds_per_clip": 0.7667994485236704,
+      "seconds_for_four": [
+        3.0683249328285456,
+        3.065561480820179,
+        3.0671977940946817
+      ],
+      "peak_allocated_gib": 4.172395706176758,
+      "parity": {
+        "max_abs": 0.046875,
+        "rmse": 0.003481453051790595,
+        "relative_rmse": 0.003959528636187315,
+        "reference_rms": 0.879259467124939
+      }
+    },
+    {
+      "chunk": 8,
+      "batch": 2,
+      "seconds_per_clip": 0.753359830006957,
+      "seconds_for_four": [
+        3.0104817394167185,
+        3.014803672209382,
+        3.013439320027828
+      ],
+      "peak_allocated_gib": 6.391757011413574,
+      "parity": {
+        "max_abs": 0.0625,
+        "rmse": 0.003194571239873767,
+        "relative_rmse": 0.003633251879364252,
+        "reference_rms": 0.879259467124939
+      }
+    },
+    {
+      "chunk": 8,
+      "batch": 4,
+      "seconds_per_clip": 0.7527565835043788,
+      "seconds_for_four": [
+        3.011026334017515,
+        3.011952893808484,
+        3.010304471477866
+      ],
+      "peak_allocated_gib": 10.838797569274902,
+      "parity": {
+        "max_abs": 0.0625,
+        "rmse": 0.0032200701534748077,
+        "relative_rmse": 0.0036622523330152035,
+        "reference_rms": 0.879259467124939
+      }
+    }
+  ],
+  "edge_vae_compiled": {
+    "compile_and_first_encode_seconds": 37.23430943861604,
+    "seconds_per_clip": 0.5220062118023634,
+    "timings": [
+      0.515460068359971,
+      0.5220062118023634,
+      0.5217101536691189,
+      0.5221954882144928,
+      0.5232628658413887
+    ],
+    "max_abs": 2.84375,
+    "rmse": 0.3867500424385071,
+    "relative_rmse": 0.478283554315567,
+    "tolerance_fail_fraction": 0.7676467895507812,
+    "peak_allocated_gib": 12.049162864685059
+  },
+  "edge_vae_compiled_precision": {
+    "compile_and_first_encode_seconds": 40.896579422056675,
+    "seconds_per_clip": 0.5216622240841389,
+    "timings": [
+      0.5162525400519371,
+      0.5236188434064388,
+      0.520312337204814,
+      0.5216622240841389,
+      0.5222197081893682
+    ],
+    "max_abs": 2.859375,
+    "rmse": 0.3870975971221924,
+    "relative_rmse": 0.4787074029445648,
+    "tolerance_fail_fraction": 0.7674824595451355,
+    "peak_allocated_gib": 12.049162864685059
+  },
+  "edge_vae_compiled_precision_layout": {
+    "compile_and_first_encode_seconds": 34.845601722598076,
+    "seconds_per_clip": 0.5257951095700264,
+    "timings": [
+      0.5219941791146994,
+      0.5251796562224627,
+      0.5271316543221474,
+      0.5263173524290323,
+      0.5257951095700264
+    ],
+    "max_abs": 2.859375,
+    "rmse": 0.38711509108543396,
+    "relative_rmse": 0.47872886061668396,
+    "tolerance_fail_fraction": 0.767596423625946,
+    "peak_allocated_gib": 12.049162864685059
+  },
+  "edge_vae_norm_validated": {
+    "indices": [
+      0,
+      1000,
+      10000,
+      50000
+    ],
+    "compile_and_four_encodes_seconds": 6.867886586114764,
+    "seconds_per_clip": 0.6809997707605362,
+    "timings": [
+      0.6799034173600376,
+      0.6809997707605362,
+      0.6828547730110586
+    ],
+    "parity": [
+      {
+        "max_abs": 0.046875,
+        "rmse": 0.002580400090664625,
+        "relative_rmse": 0.003191079944372177,
+        "tolerance_fail_fraction": 0.0
+      },
+      {
+        "max_abs": 0.046875,
+        "rmse": 0.002933233045041561,
+        "relative_rmse": 0.003149334341287613,
+        "tolerance_fail_fraction": 0.0
+      },
+      {
+        "max_abs": 0.046875,
+        "rmse": 0.0025182701647281647,
+        "relative_rmse": 0.0030079141724854708,
+        "tolerance_fail_fraction": 0.0
+      },
+      {
+        "max_abs": 0.046875,
+        "rmse": 0.0027319644577801228,
+        "relative_rmse": 0.0029287661891430616,
+        "tolerance_fail_fraction": 0.0
+      }
+    ]
+  },
+  "edge_cpu_data_profile_no_color": {
+    "torch_threads": 1,
+    "samples": [
+      {
+        "index": 100,
+        "seconds": 2.6232911869883537,
+        "shape": [
+          3,
+          33,
+          544,
+          736
+        ]
+      },
+      {
+        "index": 1000,
+        "seconds": 2.5635207071900368,
+        "shape": [
+          3,
+          33,
+          544,
+          736
+        ]
+      },
+      {
+        "index": 10000,
+        "seconds": 2.514335233718157,
+        "shape": [
+          3,
+          33,
+          544,
+          736
+        ]
+      },
+      {
+        "index": 50000,
+        "seconds": 2.744471924379468,
+        "shape": [
+          3,
+          33,
+          544,
+          736
+        ]
+      }
+    ],
+    "top_cumulative": [
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/datasets/droid_lerobot_dataset.py",
+        "line": 383,
+        "function": "__getitem__",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.343720397,
+        "cumulative_seconds": 8.078270169000001
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/datasets/action_sft_dataset.py",
+        "line": 44,
+        "function": "__getitem__",
+        "primitive_calls": 3,
+        "calls": 5,
+        "self_seconds": 0.21338014000000002,
+        "cumulative_seconds": 7.700890323
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/datasets/droid_lerobot_dataset.py",
+        "line": 308,
+        "function": "_compose_multi_view",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.10643981200000001,
+        "cumulative_seconds": 3.8494211430000003
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torch/nn/functional.py",
+        "line": 4977,
+        "function": "interpolate",
+        "primitive_calls": 12,
+        "calls": 12,
+        "self_seconds": 0.000389196,
+        "cumulative_seconds": 3.501720788
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torch/nn/modules/module.py",
+        "line": 1774,
+        "function": "_wrapped_call_impl",
+        "primitive_calls": 4,
+        "calls": 12,
+        "self_seconds": 0.000119346,
+        "cumulative_seconds": 2.684149986
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torch/nn/modules/module.py",
+        "line": 1782,
+        "function": "_call_impl",
+        "primitive_calls": 4,
+        "calls": 12,
+        "self_seconds": 0.00012363,
+        "cumulative_seconds": 2.684070589
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/_container.py",
+        "line": 49,
+        "function": "forward",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 6.333e-05,
+        "cumulative_seconds": 2.683957779
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/_transform.py",
+        "line": 57,
+        "function": "forward",
+        "primitive_calls": 8,
+        "calls": 8,
+        "self_seconds": 0.000164847,
+        "cumulative_seconds": 2.68380008
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/_transform.py",
+        "line": 47,
+        "function": "_call_kernel",
+        "primitive_calls": 8,
+        "calls": 8,
+        "self_seconds": 7.540900000000001e-05,
+        "cumulative_seconds": 2.682382758
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/_geometry.py",
+        "line": 164,
+        "function": "transform",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 3.1639e-05,
+        "cumulative_seconds": 2.682151789
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/functional/_geometry.py",
+        "line": 283,
+        "function": "resize_image",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.000388176,
+        "cumulative_seconds": 2.682073191
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch._C._nn._upsample_bilinear2d_aa>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 2.680938643,
+        "cumulative_seconds": 2.680938643
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/datasets/cosmos3_action_lerobot.py",
+        "line": 756,
+        "function": "_fetch_sample",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.000190609,
+        "cumulative_seconds": 2.576291921
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/lerobot/datasets/lerobot_dataset.py",
+        "line": 1048,
+        "function": "__getitem__",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.00039595600000000004,
+        "cumulative_seconds": 2.5759061250000004
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/lerobot/datasets/lerobot_dataset.py",
+        "line": 1014,
+        "function": "_query_videos",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.00036339600000000004,
+        "cumulative_seconds": 2.409613594
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/lerobot/datasets/video_utils.py",
+        "line": 46,
+        "function": "decode_video_frames",
+        "primitive_calls": 12,
+        "calls": 12,
+        "self_seconds": 0.012385877,
+        "cumulative_seconds": 2.401198502
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/lerobot/datasets/video_utils.py",
+        "line": 220,
+        "function": "decode_video_frames_torchcodec",
+        "primitive_calls": 12,
+        "calls": 12,
+        "self_seconds": 1.426660526,
+        "cumulative_seconds": 2.3888126250000004
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/utils/transforms.py",
+        "line": 769,
+        "function": "__call__",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.000224047,
+        "cumulative_seconds": 1.545865945
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/utils/transforms.py",
+        "line": 716,
+        "function": "_prepare_video",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.004335053,
+        "cumulative_seconds": 1.5372318280000001
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/utils/transforms.py",
+        "line": 442,
+        "function": "__call__",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.00012570000000000002,
+        "cumulative_seconds": 1.5328914450000002
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/utils/transforms.py",
+        "line": 135,
+        "function": "reflection_pad_to_target",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.000151239,
+        "cumulative_seconds": 1.532632887
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/functional.py",
+        "line": 482,
+        "function": "pad",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 8.456900000000001e-05,
+        "cumulative_seconds": 1.5321101620000002
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/_functional_tensor.py",
+        "line": 375,
+        "function": "pad",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.153042383,
+        "cumulative_seconds": 1.531890745
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch.cat>",
+        "primitive_calls": 28,
+        "calls": 28,
+        "self_seconds": 1.172221113,
+        "cumulative_seconds": 1.172221113
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/datasets/cosmos3_action_lerobot.py",
+        "line": 997,
+        "function": "_build_result",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.000180769,
+        "cumulative_seconds": 0.9814749180000001
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/datasets/cosmos3_action_lerobot.py",
+        "line": 831,
+        "function": "_convert_video",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.471774746,
+        "cumulative_seconds": 0.9792297710000001
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torch/nn/functional.py",
+        "line": 5735,
+        "function": "pad",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.000103709,
+        "cumulative_seconds": 0.830877748
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch._C._nn.pad>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.83072893,
+        "cumulative_seconds": 0.83072893
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch._C._nn.upsample_bilinear2d>",
+        "primitive_calls": 8,
+        "calls": 8,
+        "self_seconds": 0.8201956720000001,
+        "cumulative_seconds": 0.8201956720000001
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torch/_ops.py",
+        "line": 874,
+        "function": "__call__",
+        "primitive_calls": 48,
+        "calls": 48,
+        "self_seconds": 8.446e-05,
+        "cumulative_seconds": 0.715549881
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'to' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 12,
+        "calls": 12,
+        "self_seconds": 0.6650794130000001,
+        "cumulative_seconds": 0.6650794130000001
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchcodec/decoders/_video_decoder.py",
+        "line": 391,
+        "function": "get_frames_at",
+        "primitive_calls": 12,
+        "calls": 12,
+        "self_seconds": 0.000217588,
+        "cumulative_seconds": 0.662219262
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchcodec/_core/ops.py",
+        "line": 313,
+        "function": "get_frames_at_indices",
+        "primitive_calls": 12,
+        "calls": 12,
+        "self_seconds": 0.00011426900000000001,
+        "cumulative_seconds": 0.661741688
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'clamp' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.326923036,
+        "cumulative_seconds": 0.326923036
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch.stack>",
+        "primitive_calls": 44,
+        "calls": 44,
+        "self_seconds": 0.233310552,
+        "cumulative_seconds": 0.233310552
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/datasets/arrow_dataset.py",
+        "line": 2936,
+        "function": "__getitem__",
+        "primitive_calls": 76,
+        "calls": 76,
+        "self_seconds": 0.0018909940000000002,
+        "cumulative_seconds": 0.165574764
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/lerobot/datasets/lerobot_dataset.py",
+        "line": 986,
+        "function": "_query_hf_dataset",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.00028508600000000004,
+        "cumulative_seconds": 0.12338943100000001
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/datasets/arrow_dataset.py",
+        "line": 2908,
+        "function": "_getitem",
+        "primitive_calls": 56,
+        "calls": 56,
+        "self_seconds": 0.00041059600000000005,
+        "cumulative_seconds": 0.106576654
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/datasets/formatting/formatting.py",
+        "line": 621,
+        "function": "format_table",
+        "primitive_calls": 56,
+        "calls": 56,
+        "self_seconds": 0.000254917,
+        "cumulative_seconds": 0.09526477900000001
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/datasets/formatting/formatting.py",
+        "line": 409,
+        "function": "__call__",
+        "primitive_calls": 56,
+        "calls": 56,
+        "self_seconds": 6.202800000000001e-05,
+        "cumulative_seconds": 0.094495376
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/datasets/formatting/formatting.py",
+        "line": 538,
+        "function": "format_batch",
+        "primitive_calls": 36,
+        "calls": 36,
+        "self_seconds": 0.000115217,
+        "cumulative_seconds": 0.088742519
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/datasets/arrow_dataset.py",
+        "line": 673,
+        "function": "__getitem__",
+        "primitive_calls": 20,
+        "calls": 20,
+        "self_seconds": 0.00193296,
+        "cumulative_seconds": 0.065211065
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/datasets/cosmos3_action_lerobot.py",
+        "line": 134,
+        "function": "get_decoder",
+        "primitive_calls": 12,
+        "calls": 12,
+        "self_seconds": 0.000420846,
+        "cumulative_seconds": 0.060832869000000005
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchcodec/decoders/_video_decoder.py",
+        "line": 176,
+        "function": "__init__",
+        "primitive_calls": 9,
+        "calls": 9,
+        "self_seconds": 0.000305787,
+        "cumulative_seconds": 0.057225307
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/datasets/arrow_dataset.py",
+        "line": 654,
+        "function": "__init__",
+        "primitive_calls": 20,
+        "calls": 20,
+        "self_seconds": 0.00013430700000000001,
+        "cumulative_seconds": 0.057085306
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/datasets/arrow_dataset.py",
+        "line": 780,
+        "function": "features",
+        "primitive_calls": 60,
+        "calls": 60,
+        "self_seconds": 8.0938e-05,
+        "cumulative_seconds": 0.056947679
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/datasets/arrow_dataset.py",
+        "line": 205,
+        "function": "features",
+        "primitive_calls": 60,
+        "calls": 60,
+        "self_seconds": 5.957900000000001e-05,
+        "cumulative_seconds": 0.056866741000000005
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/datasets/features/features.py",
+        "line": 2171,
+        "function": "copy",
+        "primitive_calls": 60,
+        "calls": 60,
+        "self_seconds": 0.000168237,
+        "cumulative_seconds": 0.056807162
+      },
+      {
+        "file": "/.uv/python_install/cpython-3.13.14-linux-x86_64-gnu/lib/python3.13/copy.py",
+        "line": 119,
+        "function": "deepcopy",
+        "primitive_calls": 60,
+        "calls": 8940,
+        "self_seconds": 0.013556489000000001,
+        "cumulative_seconds": 0.05663892500000001
+      },
+      {
+        "file": "/.uv/python_install/cpython-3.13.14-linux-x86_64-gnu/lib/python3.13/copy.py",
+        "line": 248,
+        "function": "_reconstruct",
+        "primitive_calls": 60,
+        "calls": 1140,
+        "self_seconds": 0.004505452,
+        "cumulative_seconds": 0.05603938000000001
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchcodec/_core/_decoder_utils.py",
+        "line": 176,
+        "function": "create_video_decoder",
+        "primitive_calls": 9,
+        "calls": 9,
+        "self_seconds": 8.3838e-05,
+        "cumulative_seconds": 0.055876803
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/lerobot/datasets/utils.py",
+        "line": 411,
+        "function": "hf_transform_to_torch",
+        "primitive_calls": 36,
+        "calls": 36,
+        "self_seconds": 0.005511195,
+        "cumulative_seconds": 0.053340153
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchcodec/_core/_decoder_utils.py",
+        "line": 40,
+        "function": "create_decoder",
+        "primitive_calls": 9,
+        "calls": 9,
+        "self_seconds": 5.2000000000000004e-05,
+        "cumulative_seconds": 0.053146471
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchcodec/_core/ops.py",
+        "line": 195,
+        "function": "create_from_file_like",
+        "primitive_calls": 9,
+        "calls": 9,
+        "self_seconds": 6.2817e-05,
+        "cumulative_seconds": 0.053017462
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch._ops.torchcodec_ns.>",
+        "primitive_calls": 9,
+        "calls": 9,
+        "self_seconds": 0.052146791000000005,
+        "cumulative_seconds": 0.052784465
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch.tensor>",
+        "primitive_calls": 12684,
+        "calls": 12684,
+        "self_seconds": 0.048330033,
+        "cumulative_seconds": 0.048330033
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/lerobot/datasets/lerobot_dataset.py",
+        "line": 967,
+        "function": "_get_query_timestamps",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.001268718,
+        "cumulative_seconds": 0.036251592
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/datasets/formatting/formatting.py",
+        "line": 149,
+        "function": "extract_batch",
+        "primitive_calls": 36,
+        "calls": 36,
+        "self_seconds": 0.035088059000000005,
+        "cumulative_seconds": 0.035088059000000005
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'amin' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.031761449000000004,
+        "cumulative_seconds": 0.031761449000000004
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'amax' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.031300106,
+        "cumulative_seconds": 0.031300106
+      }
+    ],
+    "top_self": [
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch._C._nn._upsample_bilinear2d_aa>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 2.680938643,
+        "cumulative_seconds": 2.680938643
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/lerobot/datasets/video_utils.py",
+        "line": 220,
+        "function": "decode_video_frames_torchcodec",
+        "primitive_calls": 12,
+        "calls": 12,
+        "self_seconds": 1.426660526,
+        "cumulative_seconds": 2.3888126250000004
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch.cat>",
+        "primitive_calls": 28,
+        "calls": 28,
+        "self_seconds": 1.172221113,
+        "cumulative_seconds": 1.172221113
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch._C._nn.pad>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.83072893,
+        "cumulative_seconds": 0.83072893
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch._C._nn.upsample_bilinear2d>",
+        "primitive_calls": 8,
+        "calls": 8,
+        "self_seconds": 0.8201956720000001,
+        "cumulative_seconds": 0.8201956720000001
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'to' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 12,
+        "calls": 12,
+        "self_seconds": 0.6650794130000001,
+        "cumulative_seconds": 0.6650794130000001
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/datasets/cosmos3_action_lerobot.py",
+        "line": 831,
+        "function": "_convert_video",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.471774746,
+        "cumulative_seconds": 0.9792297710000001
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/datasets/droid_lerobot_dataset.py",
+        "line": 383,
+        "function": "__getitem__",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.343720397,
+        "cumulative_seconds": 8.078270169000001
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'clamp' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.326923036,
+        "cumulative_seconds": 0.326923036
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch.stack>",
+        "primitive_calls": 44,
+        "calls": 44,
+        "self_seconds": 0.233310552,
+        "cumulative_seconds": 0.233310552
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/datasets/action_sft_dataset.py",
+        "line": 44,
+        "function": "__getitem__",
+        "primitive_calls": 3,
+        "calls": 5,
+        "self_seconds": 0.21338014000000002,
+        "cumulative_seconds": 7.700890323
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/_functional_tensor.py",
+        "line": 375,
+        "function": "pad",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.153042383,
+        "cumulative_seconds": 1.531890745
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/datasets/droid_lerobot_dataset.py",
+        "line": 308,
+        "function": "_compose_multi_view",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.10643981200000001,
+        "cumulative_seconds": 3.8494211430000003
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch._ops.torchcodec_ns.>",
+        "primitive_calls": 9,
+        "calls": 9,
+        "self_seconds": 0.052146791000000005,
+        "cumulative_seconds": 0.052784465
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch.tensor>",
+        "primitive_calls": 12684,
+        "calls": 12684,
+        "self_seconds": 0.048330033,
+        "cumulative_seconds": 0.048330033
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/datasets/formatting/formatting.py",
+        "line": 149,
+        "function": "extract_batch",
+        "primitive_calls": 36,
+        "calls": 36,
+        "self_seconds": 0.035088059000000005,
+        "cumulative_seconds": 0.035088059000000005
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'amin' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.031761449000000004,
+        "cumulative_seconds": 0.031761449000000004
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'amax' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.031300106,
+        "cumulative_seconds": 0.031300106
+      },
+      {
+        "file": "/.uv/python_install/cpython-3.13.14-linux-x86_64-gnu/lib/python3.13/copy.py",
+        "line": 119,
+        "function": "deepcopy",
+        "primitive_calls": 60,
+        "calls": 8940,
+        "self_seconds": 0.013556489000000001,
+        "cumulative_seconds": 0.05663892500000001
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/lerobot/datasets/video_utils.py",
+        "line": 46,
+        "function": "decode_video_frames",
+        "primitive_calls": 12,
+        "calls": 12,
+        "self_seconds": 0.012385877,
+        "cumulative_seconds": 2.401198502
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/datasets/features/features.py",
+        "line": 1663,
+        "function": "require_decoding",
+        "primitive_calls": 9360,
+        "calls": 11700,
+        "self_seconds": 0.010601103,
+        "cumulative_seconds": 0.018121094
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method builtins.isinstance>",
+        "primitive_calls": 68316,
+        "calls": 68316,
+        "self_seconds": 0.009496036000000001,
+        "cumulative_seconds": 0.009939711
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/datasets/table.py",
+        "line": 112,
+        "function": "fast_gather",
+        "primitive_calls": 32,
+        "calls": 32,
+        "self_seconds": 0.0067589370000000005,
+        "cumulative_seconds": 0.006987935000000001
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/lerobot/datasets/utils.py",
+        "line": 411,
+        "function": "hf_transform_to_torch",
+        "primitive_calls": 36,
+        "calls": 36,
+        "self_seconds": 0.005511195,
+        "cumulative_seconds": 0.053340153
+      },
+      {
+        "file": "/.uv/python_install/cpython-3.13.14-linux-x86_64-gnu/lib/python3.13/copy.py",
+        "line": 248,
+        "function": "_reconstruct",
+        "primitive_calls": 60,
+        "calls": 1140,
+        "self_seconds": 0.004505452,
+        "cumulative_seconds": 0.05603938000000001
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/utils/transforms.py",
+        "line": 716,
+        "function": "_prepare_video",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.004335053,
+        "cumulative_seconds": 1.5372318280000001
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/datasets/formatting/formatting.py",
+        "line": 143,
+        "function": "extract_row",
+        "primitive_calls": 20,
+        "calls": 20,
+        "self_seconds": 0.003322733,
+        "cumulative_seconds": 0.0034254130000000004
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'get' of 'dict' objects>",
+        "primitive_calls": 18749,
+        "calls": 18749,
+        "self_seconds": 0.0032635050000000003,
+        "cumulative_seconds": 0.0032635050000000003
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/datasets/features/features.py",
+        "line": 1729,
+        "function": "wrapper",
+        "primitive_calls": 720,
+        "calls": 720,
+        "self_seconds": 0.003167544,
+        "cumulative_seconds": 0.019964533
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'encode_batch' of 'tokenizers.Tokenizer' objects>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.0029089880000000004,
+        "cumulative_seconds": 0.0029089880000000004
+      },
+      {
+        "file": "/.uv/python_install/cpython-3.13.14-linux-x86_64-gnu/lib/python3.13/copy.py",
+        "line": 218,
+        "function": "_deepcopy_dict",
+        "primitive_calls": 60,
+        "calls": 960,
+        "self_seconds": 0.002881223,
+        "cumulative_seconds": 0.030847043
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'read' of '_io.BufferedReader' objects>",
+        "primitive_calls": 75,
+        "calls": 75,
+        "self_seconds": 0.0025873840000000003,
+        "cumulative_seconds": 0.0025873840000000003
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/datasets/arrow_dataset.py",
+        "line": 673,
+        "function": "__getitem__",
+        "primitive_calls": 20,
+        "calls": 20,
+        "self_seconds": 0.00193296,
+        "cumulative_seconds": 0.065211065
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/datasets/table.py",
+        "line": 129,
+        "function": "fast_slice",
+        "primitive_calls": 24,
+        "calls": 24,
+        "self_seconds": 0.001900694,
+        "cumulative_seconds": 0.0021356310000000002
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/datasets/arrow_dataset.py",
+        "line": 2936,
+        "function": "__getitem__",
+        "primitive_calls": 76,
+        "calls": 76,
+        "self_seconds": 0.0018909940000000002,
+        "cumulative_seconds": 0.165574764
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'unbind' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 36,
+        "calls": 36,
+        "self_seconds": 0.001713551,
+        "cumulative_seconds": 0.001713551
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method builtins.id>",
+        "primitive_calls": 13020,
+        "calls": 13020,
+        "self_seconds": 0.001646448,
+        "cumulative_seconds": 0.001646448
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method builtins.hasattr>",
+        "primitive_calls": 11084,
+        "calls": 11084,
+        "self_seconds": 0.001631969,
+        "cumulative_seconds": 0.001631969
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/lerobot/datasets/lerobot_dataset.py",
+        "line": 967,
+        "function": "_get_query_timestamps",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.001268718,
+        "cumulative_seconds": 0.036251592
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/datasets/features/features.py",
+        "line": 1607,
+        "function": "_visit",
+        "primitive_calls": 720,
+        "calls": 900,
+        "self_seconds": 0.001247503,
+        "cumulative_seconds": 0.002289249
+      }
+    ]
+  },
+  "reproducible_encoder_benchmark": {
+    "torch_version": "2.13.0+cu130",
+    "gpu": "NVIDIA RTX A6000",
+    "seed": 42,
+    "input_shapes": [
+      [
+        1,
+        3,
+        33,
+        544,
+        736
+      ],
+      [
+        1,
+        3,
+        33,
+        544,
+        736
+      ],
+      [
+        1,
+        3,
+        33,
+        544,
+        736
+      ],
+      [
+        1,
+        3,
+        33,
+        544,
+        736
+      ]
+    ],
+    "random_crop": true,
+    "color_augmentation": false,
+    "eager_seconds_per_clip": 0.75171023234725,
+    "compiled_seconds_per_clip": 0.6803088528104126,
+    "eager_timings": [
+      0.75171023234725,
+      0.7515658340416849,
+      0.7521780994720757
+    ],
+    "compiled_timings": [
+      0.6830806885845959,
+      0.6803088528104126,
+      0.6802148590795696
+    ],
+    "compile_and_first_encodes_seconds": 7.135446136817336,
+    "parity": [
+      {
+        "index": 0,
+        "max_abs": 0.046875,
+        "rmse": 0.0023970059119164944,
+        "relative_rmse": 0.0029643333982676268,
+        "tolerance_fail_fraction": 0.0
+      },
+      {
+        "index": 1000,
+        "max_abs": 0.0390625,
+        "rmse": 0.0029267710633575916,
+        "relative_rmse": 0.0031423927284777164,
+        "tolerance_fail_fraction": 0.0
+      },
+      {
+        "index": 10000,
+        "max_abs": 0.03125,
+        "rmse": 0.002508214209228754,
+        "relative_rmse": 0.002995888004079461,
+        "tolerance_fail_fraction": 0.0
+      },
+      {
+        "index": 50000,
+        "max_abs": 0.046875,
+        "rmse": 0.002747451653704047,
+        "relative_rmse": 0.002945401007309556,
+        "tolerance_fail_fraction": 0.0
+      }
+    ]
+  }
+}

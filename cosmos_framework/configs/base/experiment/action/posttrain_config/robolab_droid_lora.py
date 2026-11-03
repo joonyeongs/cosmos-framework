@@ -68,6 +68,7 @@ dataset.split = "full"
 dataset.split_val_ratio = 0.0
 dataset.use_success_only = True
 dataset.use_image_augmentation = True
+dataset.use_color_augmentation = False
 r.trainer.callbacks.robolab_training_audit = L(RoboLabTrainingAudit)()
 if os.environ.get("COSMOS_DROID_PROFILE") == "1":
     from cosmos_framework.callbacks.robolab_phase_profile import RoboLabPhaseProfile

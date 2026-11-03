@@ -7,10 +7,11 @@ import wandb
 from torch.distributed.tensor import DTensor, Partial
 
 from cosmos_framework.callbacks.every_n import EveryN
+from cosmos_framework.callbacks.moe_mesh import get_moe_device_mesh
 from cosmos_framework.model._base import ImaginaireModel
+from cosmos_framework.model.generator.reasoner.qwen3_vl_moe.qwen3_vl_moe import Qwen3VLMoeTextSparseMoeBlock
 from cosmos_framework.trainer import ImaginaireTrainer
 from cosmos_framework.utils import distributed
-from cosmos_framework.model.generator.reasoner.qwen3_vl_moe.qwen3_vl_moe import Qwen3VLMoeTextSparseMoeBlock
 
 
 def compute_expert_heatmap(vfm: torch.nn.Module) -> dict[str, torch.Tensor]:
@@ -30,12 +31,7 @@ def compute_expert_heatmap(vfm: torch.nn.Module) -> dict[str, torch.Tensor]:
     with torch.no_grad():
         num_layers = len(vfm.language_model.model.layers)
 
-        example_dtensor = vfm.language_model.model.layers[0].self_attn.q_proj.weight
-        if isinstance(example_dtensor, DTensor):
-            assert hasattr(example_dtensor, "device_mesh")
-            device_mesh = example_dtensor.device_mesh
-        else:
-            device_mesh = None
+        device_mesh = get_moe_device_mesh(vfm)
 
         expert_heatmaps = {}
         for tower in ["und", "gen"]:
@@ -43,7 +39,7 @@ def compute_expert_heatmap(vfm: torch.nn.Module) -> dict[str, torch.Tensor]:
 
             for layer_idx in range(num_layers):
                 layer_module = vfm.language_model.model.layers[layer_idx]
-                mlp_module = layer_module.mlp if tower == "und" else layer_module.mlp_moe_gen
+                mlp_module = getattr(layer_module, "mlp" if tower == "und" else "mlp_moe_gen", None)
                 if isinstance(mlp_module, Qwen3VLMoeTextSparseMoeBlock):
                     # This is accumulated across all iterations.
                     total_tokens_per_expert = mlp_module.get_total_tokens_per_expert()

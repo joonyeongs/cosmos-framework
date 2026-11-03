@@ -25,6 +25,7 @@ def _dataset(use_image_augmentation: bool, jitter_after_compose: bool = False) -
     dataset._jitter_after_compose = jitter_after_compose
     dataset._image_augmentor = None
     dataset._color_augmentor = None
+    dataset._use_color_augmentation = True
     return dataset
 
 
@@ -109,3 +110,15 @@ def test_default_keeps_jitter_inside_the_per_view_pipeline() -> None:
     reordered._compose_multi_view(_sample(0.1, 0.5, 0.9))
     assert isinstance(reordered._color_augmentor, T.ColorJitter)
     assert not any(isinstance(t, T.ColorJitter) for t in reordered._image_augmentor.transforms)
+
+
+@pytest.mark.parametrize("jitter_after_compose", [False, True])
+def test_disable_color_preserves_crop_resize_and_colors(jitter_after_compose):
+    dataset = _dataset(use_image_augmentation=True, jitter_after_compose=jitter_after_compose)
+    dataset._use_color_augmentation = False
+    result = dataset._compose_multi_view(_sample(0.1, 0.5, 0.9))
+    assert dataset._color_augmentor is None
+    assert [type(t) for t in dataset._image_augmentor.transforms] == [T.RandomCrop, T.Resize]
+    torch.testing.assert_close(result[:, :, :16], torch.full((2, 3, 16, 32), 0.1))
+    torch.testing.assert_close(result[:, :, 16:, :16], torch.full((2, 3, 8, 16), 0.5))
+    torch.testing.assert_close(result[:, :, 16:, 16:], torch.full((2, 3, 8, 16), 0.9))

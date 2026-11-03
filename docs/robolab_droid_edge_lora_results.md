@@ -1,5 +1,9 @@
 # Executed Edge LoRA benchmark — 2026-11-03
 
+This is the historical baseline with color augmentation and two-way sharding.
+See the [live-encoding optimization report](robolab_droid_edge_optimization.md)
+for subsequent changes and measurements.
+
 Five actual optimizer updates completed: four benchmark steps plus one step after
 restoring the adapter and optimizer checkpoint. The full 4,000-step run was not executed.
 

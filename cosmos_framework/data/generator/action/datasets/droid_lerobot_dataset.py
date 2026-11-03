@@ -104,6 +104,7 @@ class DROIDLeRobotDataset(BaseActionLeRobotDataset):
         # would shift every later argument for positional callers.
         apply_forward_clamp: bool = False,
         jitter_after_compose: bool = False,
+        use_color_augmentation: bool = True,
     ) -> None:
         """ """
         super().__init__(
@@ -187,6 +188,7 @@ class DROIDLeRobotDataset(BaseActionLeRobotDataset):
 
         self._image_augmentor: T.Compose | None = None
         self._color_augmentor: T.ColorJitter | None = None
+        self._use_color_augmentation = use_color_augmentation
 
         # Eager source registration. Upstream defers this to its own dataloader's
         # ActionUnifiedIterableDataset.assign_worker(); cosmos-framework instead
@@ -345,11 +347,12 @@ class DROIDLeRobotDataset(BaseActionLeRobotDataset):
                     T.RandomCrop((int(h * 0.95), int(w * 0.95))),
                     T.Resize((h, w), antialias=True),
                 ]
-                color_jitter = T.ColorJitter(brightness=0.3, contrast=0.4, saturation=0.5, hue=0.08)
-                if self._jitter_after_compose:
-                    self._color_augmentor = color_jitter
-                else:
-                    transforms.append(color_jitter)
+                if self._use_color_augmentation:
+                    color_jitter = T.ColorJitter(brightness=0.3, contrast=0.4, saturation=0.5, hue=0.08)
+                    if self._jitter_after_compose:
+                        self._color_augmentor = color_jitter
+                    else:
+                        transforms.append(color_jitter)
                 self._image_augmentor = T.Compose(transforms)
             n, m = wrist.shape[0], wrist.shape[0] + left.shape[0]
             combined = self._image_augmentor(torch.cat([wrist, left, right], dim=0))

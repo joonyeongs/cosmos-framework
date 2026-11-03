@@ -6,8 +6,20 @@ measured step times and the projected full-run duration.
 This recipe uses the same 200 demonstrations and training settings as
 [the Nano recipe](robolab_droid_lora.md): two RTX A6000 48 GB GPUs, global
 batch 128, BF16, full activation checkpointing, generator-only LoRA rank 16 /
-alpha 32, native video/action losses and image augmentation, and a 4,000-step
+alpha 32, native video/action losses and random crop/rescale, and a 4,000-step
 linear learning-rate schedule. No full training run is launched by validation.
+
+Color augmentation is now disabled in both RoboLab recipes. Edge additionally
+compiles only VAE encoder normalization operations, preserving BF16 intermediate
+casts; convolution and attention execute eagerly. Four data workers per GPU now
+prefetch 32 clips (prefetch factor 8). Original two-way FSDP sharding is retained.
+See the
+[optimization report](robolab_droid_edge_optimization.md) for numerical checks
+and measured performance. Historical baseline results retain their original
+augmentation and parallelism settings.
+
+The latest measured median is **132.7 seconds/optimizer step**, projecting to
+**147.4 hours (6.1 days)** for 4,000 steps. No full run was executed.
 
 The base is `nvidia/Cosmos3-Edge-Policy-DROID`, revision
 `0110e64ca982589f1a3d856cbdd7d465dccb79bc`, staged at

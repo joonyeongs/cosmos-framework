@@ -140,10 +140,11 @@ import wandb
 from torch.distributed.tensor import DTensor, Partial
 
 from cosmos_framework.callbacks.every_n import EveryN
+from cosmos_framework.callbacks.moe_mesh import get_moe_device_mesh
 from cosmos_framework.model._base import ImaginaireModel
+from cosmos_framework.model.generator.reasoner.qwen3_vl_moe.qwen3_vl_moe import Qwen3VLMoeTextSparseMoeBlock
 from cosmos_framework.trainer import ImaginaireTrainer
 from cosmos_framework.utils import distributed
-from cosmos_framework.model.generator.reasoner.qwen3_vl_moe.qwen3_vl_moe import Qwen3VLMoeTextSparseMoeBlock
 
 
 def _effective_experts(
@@ -279,8 +280,7 @@ def compute_moe_stability_metrics(vfm: torch.nn.Module) -> dict[str, dict]:
     with torch.no_grad():
         num_layers = len(vfm.language_model.model.layers)
 
-        example_weight = vfm.language_model.model.layers[0].self_attn.q_proj.weight
-        device_mesh = example_weight.device_mesh if isinstance(example_weight, DTensor) else None
+        device_mesh = get_moe_device_mesh(vfm)
 
         if device_mesh is None:
             return {}

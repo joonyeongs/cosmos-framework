@@ -3,12 +3,13 @@
 
 from types import SimpleNamespace
 
+import pytest
 import torch
 import torch.distributed as dist
 import torch.multiprocessing as mp
 from torch import nn
 
-from cosmos_framework.callbacks.robolab_training_audit import RoboLabTrainingAudit, digest
+from cosmos_framework.callbacks.robolab_training_audit import RoboLabTrainingAudit, digest, steady_step_times
 
 
 def _audit_worker(rank, rendezvous):
@@ -54,3 +55,17 @@ def _audit_worker(rank, rendezvous):
 
 def test_audit_combines_shards_and_rejects_global_failures(tmp_path):
     mp.spawn(_audit_worker, args=(str(tmp_path / "rendezvous"),), nprocs=2, join=True)
+
+
+@pytest.mark.L0
+def test_scheduled_save_is_subtracted_but_final_save_outside_timer_is_not():
+    steps = [
+        {"iteration": 1, "seconds_including_checkpoint": 200},
+        {"iteration": 2, "seconds_including_checkpoint": 102},
+        {"iteration": 3, "seconds_including_checkpoint": 100},
+    ]
+    saves = [
+        {"iteration": 2, "seconds": 2, "included_in_step_timing": True},
+        {"iteration": 3, "seconds": 3, "included_in_step_timing": False},
+    ]
+    assert steady_step_times(steps, saves) == [100, 100]

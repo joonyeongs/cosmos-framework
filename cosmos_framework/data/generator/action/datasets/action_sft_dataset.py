@@ -104,6 +104,7 @@ def get_action_droid_sft_dataset(
     action_normalization: str | None = None,
     viewpoint: str = "concat_view",
     use_image_augmentation: bool = False,
+    use_color_augmentation: bool = True,
     jitter_after_compose: bool = False,
     use_filter_dict: bool = False,
     filter_dict_path: str | None = None,
@@ -138,6 +139,7 @@ def get_action_droid_sft_dataset(
         use_state=use_state,
         action_normalization=action_normalization,
         use_image_augmentation=use_image_augmentation,  # upstream: bundles random-crop+resize+ColorJitter
+        use_color_augmentation=use_color_augmentation,
         jitter_after_compose=jitter_after_compose,
         use_filter_dict=use_filter_dict,
         filter_dict_path=filter_dict_path,
@@ -305,6 +307,7 @@ def get_action_robocasa_sft_dataset(
     if iterable_shuffle:
         return ActionIterableShuffleDataset(sft, seed=episode_shuffle_seed)
     return sft
+
 
 def get_action_libero_sft_dataset(
     *,

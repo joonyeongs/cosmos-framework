@@ -21,6 +21,14 @@ def digest(parameter):
     return hashlib.sha256(value.detach().contiguous().view(torch.uint8).cpu().numpy().tobytes()).hexdigest()
 
 
+def steady_step_times(steps, saves):
+    """Exclude warm-up and only saves that actually occurred inside a step timer."""
+    timed_saves = {
+        entry["iteration"]: entry["seconds"] for entry in saves if entry.get("included_in_step_timing", True)
+    }
+    return [max(0.0, row["seconds_including_checkpoint"] - timed_saves.get(row["iteration"], 0.0)) for row in steps[1:]]
+
+
 class RoboLabTrainingAudit(Callback):
     def on_train_start(self, model, iteration=0):
         self.started = time.monotonic()
@@ -43,6 +51,11 @@ class RoboLabTrainingAudit(Callback):
         self.report = {
             "startup_seconds": self.startup_s,
             "world_size": self.world_size,
+            "parallelism": {
+                "data_parallel_shard_degree": model.config.parallelism.data_parallel_shard_degree,
+                "data_parallel_replicate_degree": model.config.parallelism.data_parallel_replicate_degree,
+                "context_parallel_shard_degree": model.config.parallelism.context_parallel_shard_degree,
+            },
             "per_device_batch_size": self.config.dataloader_train.max_samples_per_batch,
             "gradient_accumulation_steps": self.config.trainer.grad_accum_iter,
             "effective_batch_size": self.world_size
@@ -76,7 +89,15 @@ class RoboLabTrainingAudit(Callback):
         self.save_started = time.monotonic()
 
     def on_save_checkpoint_end(self, model, iteration=0):
-        self.saves.append({"iteration": iteration, "seconds": time.monotonic() - self.save_started})
+        self.saves.append(
+            {
+                "iteration": iteration,
+                "seconds": time.monotonic() - self.save_started,
+                # A final save can run AFTER on_training_step_end; subtracting
+                # it from the already recorded step would understate runtime.
+                "included_in_step_timing": not any(row["iteration"] == iteration for row in self.steps),
+            }
+        )
 
     def on_training_step_end(self, model, data_batch, output_batch, loss, iteration=0):
         torch.cuda.synchronize()
@@ -106,10 +127,7 @@ class RoboLabTrainingAudit(Callback):
 
     def _write(self, model):
         checkpoint_seconds = {entry["iteration"]: entry["seconds"] for entry in self.saves}
-        steady = [
-            max(0.0, row["seconds_including_checkpoint"] - checkpoint_seconds.get(row["iteration"], 0.0))
-            for row in self.steps[1:]
-        ]
+        steady = steady_step_times(self.steps, self.saves)
         save_median = statistics.median(checkpoint_seconds.values()) if checkpoint_seconds else 0.0
         peak = (
             torch.tensor(

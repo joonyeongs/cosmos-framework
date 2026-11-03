@@ -11,9 +11,11 @@ episodes and three 640×360, 15 Hz camera videos live under its `original/`
 directory. The exported LeRobot v3 root is
 `train_ready/droid_plus_lerobot_640x360_20260412/success` beneath the dataset root.
 The native DROID loader reads raw absolute joint actions and robot state, and
-composes wrist/left/right views. The original crop/rescale and ColorJitter
-augmentation remain enabled. All 200 episodes participate in training; the
+composes wrist/left/right views. Random crop/rescale remains enabled; ColorJitter
+is disabled per the updated request. All 200 episodes participate in training; the
 loader's normal complete 33-image/32-action windows are used.
+Historical Nano timings below predate color removal; the updated Nano throughput
+has not been remeasured.
 
 After collection and export, run from `/root/cosmos-framework`:
 
@@ -108,7 +110,7 @@ The launcher verifies the 200-episode quota and complete conditioning first.
 
 The full recipe is 4,000 **optimizer** steps with rank-16, alpha-32, zero-dropout
 LoRA; learning rate 0.0001 decays linearly to zero. Native AdamW settings,
-gradient clipping, video/action flow-matching objectives, and image augmentation
+gradient clipping, video/action flow-matching objectives, and random crop/rescale
 are retained. Only generator attention/MLP projections, video input/output
 projections, and action input/output adapters train. All pretrained base weights,
 including DROID action boundaries, stay frozen. EMA is disabled, full activation

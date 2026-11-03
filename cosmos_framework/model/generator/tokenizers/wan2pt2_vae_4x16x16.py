@@ -15,13 +15,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange
 
-from cosmos_framework.utils.flags import DEVICE, INTERNAL, TRAINING
-from cosmos_framework.utils import log
-from cosmos_framework.utils.distributed import get_rank, sync_model_states
-from cosmos_framework.utils.easy_io import easy_io
 from cosmos_framework.data.generator.utils import VIDEO_RES_SIZE_INFO
 from cosmos_framework.model.generator.tokenizers.chunk_timing import median_cuda_seconds, time_across_ranks
 from cosmos_framework.model.generator.tokenizers.interface import VideoTokenizerInterface
+from cosmos_framework.utils import log
+from cosmos_framework.utils.distributed import get_rank, sync_model_states
+from cosmos_framework.utils.easy_io import easy_io
+from cosmos_framework.utils.flags import DEVICE, INTERNAL, TRAINING
 from cosmos_framework.utils.generator.data_utils import get_vision_data_resolution
 
 # For sequential decoding, CACHE_T is the number of frames to cache.
@@ -1639,6 +1639,7 @@ class Wan2pt2VAEInterface(VideoTokenizerInterface):
         temporal_window: int | None = None,
         encode_bucket_multiple: int | None = None,
         causal: bool = True,
+        compile_encoder_norms: bool = False,
     ):
         # Remove temporal_window and encode_bucket_multiple once they have been
         # removed from the uploaded HuggingFace checkpoint.
@@ -1678,6 +1679,8 @@ class Wan2pt2VAEInterface(VideoTokenizerInterface):
         self._decoder_override: nn.Module | None = None
         self.encode_chunk_frames = encode_chunk_frames
         self.encode_exact_durations = encode_exact_durations
+        if compile_encoder_norms:
+            self.compile_encoder_norms()
 
         # When True, keep the decoder cache between decode calls.
         self._keep_decoder_cache = keep_decoder_cache
@@ -1692,6 +1695,27 @@ class Wan2pt2VAEInterface(VideoTokenizerInterface):
         self._temporal_compression_factor = temporal_compression_factor
         self._causal = causal
         assert self._causal, "Wan2pt2VAEInterface is a causal tokenizer; causal must be True."
+
+    def compile_encoder_norms(self) -> None:
+        """Fuse encoder normalization only, preserving native convolutions and attention.
+
+        Whole-chunk compilation miscompiled the 24-frame RoboLab chunk on the
+        measured PyTorch stack. Keep that path eager and preserve BF16 intermediate
+        casts in the smaller normalization graphs. Decoder and state-dict keys are
+        unchanged. First use compiles each channel/layout specialization.
+        """
+        if getattr(self, "_encoder_norms_compiled", False):
+            return
+        # Norms share one forward code object across channel sizes and 4D/5D
+        # layouts; the default eight-specialization limit is too small.
+        torch._dynamo.config.recompile_limit = max(torch._dynamo.config.recompile_limit, 128)
+        compiled_forward = torch.compile(
+            RMS_norm.forward, fullgraph=True, dynamic=True, options={"emulate_precision_casts": True}
+        )
+        for module in self.model.model.encoder.modules():
+            if isinstance(module, RMS_norm):
+                module.forward = compiled_forward.__get__(module, type(module))
+        self._encoder_norms_compiled = True
 
     @property
     def dtype(self) -> torch.dtype:
