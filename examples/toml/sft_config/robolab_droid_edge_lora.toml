@@ -1,0 +1,38 @@
+# Shared LoRA for the 200 successful RoboLab demonstrations; all used for training.
+[job]
+task = "vfm"
+experiment = "robolab_droid_edge_lora"
+project = "robolab"
+group = "cosmos3_droid_edge_lora"
+name = "eight_tasks"
+wandb_mode = "disabled"
+
+[model]
+precision = "bfloat16"
+
+[model.parallelism]
+data_parallel_shard_degree = 2
+data_parallel_replicate_degree = 1
+
+[model.activation_checkpointing]
+mode = "full"
+
+[model.tokenizer]
+vae_path = "${oc.env:WAN_VAE_PATH}"
+
+[optimizer]
+lr = 0.0001
+
+[scheduler]
+cycle_lengths = [4000]
+
+[dataloader_train]
+max_samples_per_batch = 64
+
+[trainer]
+max_iter = 4000
+grad_accum_iter = 1
+logging_iter = 1
+
+[checkpoint]
+save_iter = 250

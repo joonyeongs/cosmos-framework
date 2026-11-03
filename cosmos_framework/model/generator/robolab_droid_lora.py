@@ -145,6 +145,12 @@ class FrozenFloat32Linear(nn.Linear):
         return F.linear(x.float(), self.weight.float(), None if self.bias is None else self.bias.float())
 
 
+def is_generator_language_parameter(name):
+    # Edge's frozen cross-attention K norm serves the generator, despite its
+    # name containing "und". Cached keys already include this normalization.
+    return "moe_gen" in name or ".k_norm_und_for_gen." in name
+
+
 def prune_understanding_on_meta(net):
     lm = net.language_model
     if any(p.device.type != "meta" for p in lm.parameters()):
@@ -163,7 +169,7 @@ def prune_understanding_on_meta(net):
             setattr(attn, name, EmptyLinear(getattr(attn, name).out_features))
         attn.q_norm = nn.Identity()
         attn.k_norm = nn.Identity()
-    remaining = [name for name, _ in lm.named_parameters() if "moe_gen" not in name]
+    remaining = [name for name, _ in lm.named_parameters() if not is_generator_language_parameter(name)]
     if remaining:
         raise ValueError(f"Understanding parameters survived pruning: {remaining}")
 

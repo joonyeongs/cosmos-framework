@@ -1,0 +1,1092 @@
+{
+  "profile_run": "/root/RoboLab/output/cosmos3_droid_demos/training_runs/robolab/cosmos3_droid_edge_lora/edge_phase_profile_20261103",
+  "rank_profiles": [
+    [
+      {
+        "iteration": 1,
+        "wall_seconds": 243.3777419719845,
+        "seconds": {
+          "dataloader_wait": 98.68043670803308,
+          "vae_encode": 53.964399598538876,
+          "inputs_including_vae": 54.09022627957165,
+          "cached_conditioning": 0.5757779758423567,
+          "generator_forward": 20.945193730294704,
+          "loss_computation": 0.030170368030667305,
+          "forward_total": 75.83542441576719,
+          "backward_including_recompute_and_communication": 67.84352320432663,
+          "optimizer_update": 0.1519022360444069
+        },
+        "calls": {
+          "dataloader_wait": 2,
+          "vae_encode": 64,
+          "inputs_including_vae": 2,
+          "cached_conditioning": 2,
+          "generator_forward": 2,
+          "loss_computation": 2,
+          "forward_total": 2,
+          "backward_including_recompute_and_communication": 2,
+          "optimizer_update": 1
+        },
+        "loss": 2.103440761566162,
+        "vision_tokens_last_microbatch": null,
+        "action_tokens_last_microbatch": null
+      },
+      {
+        "iteration": 2,
+        "wall_seconds": 228.59921539574862,
+        "seconds": {
+          "dataloader_wait": 91.96291080489755,
+          "vae_encode": 48.06812101602554,
+          "inputs_including_vae": 48.176168067380786,
+          "cached_conditioning": 0.5336819272488356,
+          "generator_forward": 20.289561089128256,
+          "loss_computation": 0.028721492737531662,
+          "forward_total": 69.21774209477007,
+          "backward_including_recompute_and_communication": 67.35546283237636,
+          "optimizer_update": 0.028649674728512764
+        },
+        "calls": {
+          "dataloader_wait": 2,
+          "vae_encode": 64,
+          "inputs_including_vae": 2,
+          "cached_conditioning": 2,
+          "generator_forward": 2,
+          "loss_computation": 2,
+          "forward_total": 2,
+          "backward_including_recompute_and_communication": 2,
+          "optimizer_update": 1
+        },
+        "loss": 2.6489717960357666,
+        "vision_tokens_last_microbatch": null,
+        "action_tokens_last_microbatch": null
+      }
+    ],
+    [
+      {
+        "iteration": 1,
+        "wall_seconds": 244.08804431930184,
+        "seconds": {
+          "dataloader_wait": 99.38761847652495,
+          "vae_encode": 54.49846943281591,
+          "inputs_including_vae": 54.65151816792786,
+          "cached_conditioning": 0.5437720473855734,
+          "generator_forward": 20.43198325484991,
+          "loss_computation": 0.030088748782873154,
+          "forward_total": 75.85848044790328,
+          "backward_including_recompute_and_communication": 67.82002524286509,
+          "optimizer_update": 0.15472913533449173
+        },
+        "calls": {
+          "dataloader_wait": 2,
+          "vae_encode": 64,
+          "inputs_including_vae": 2,
+          "cached_conditioning": 2,
+          "generator_forward": 2,
+          "loss_computation": 2,
+          "forward_total": 2,
+          "backward_including_recompute_and_communication": 2,
+          "optimizer_update": 1
+        },
+        "loss": 1.7607454061508179,
+        "vision_tokens_last_microbatch": null,
+        "action_tokens_last_microbatch": null
+      },
+      {
+        "iteration": 2,
+        "wall_seconds": 228.598797198385,
+        "seconds": {
+          "dataloader_wait": 91.75759291648865,
+          "vae_encode": 48.55973678268492,
+          "inputs_including_vae": 48.6657887455076,
+          "cached_conditioning": 0.5101081766188145,
+          "generator_forward": 20.092528261244297,
+          "loss_computation": 0.028906630352139473,
+          "forward_total": 69.48753543198109,
+          "backward_including_recompute_and_communication": 67.28999217227101,
+          "optimizer_update": 0.02985120192170143
+        },
+        "calls": {
+          "dataloader_wait": 2,
+          "vae_encode": 64,
+          "inputs_including_vae": 2,
+          "cached_conditioning": 2,
+          "generator_forward": 2,
+          "loss_computation": 2,
+          "forward_total": 2,
+          "backward_including_recompute_and_communication": 2,
+          "optimizer_update": 1
+        },
+        "loss": 2.3868703842163086,
+        "vision_tokens_last_microbatch": null,
+        "action_tokens_last_microbatch": null
+      }
+    ]
+  ],
+  "steady_step_mean_across_ranks_seconds": 228.5990062970668,
+  "exclusive_breakdown_seconds": {
+    "Data-loader wait": 91.8602518606931,
+    "Backward, recomputation and communication": 67.32272750232369,
+    "Frozen video encoder (VAE)": 48.31392889935523,
+    "Generator forward": 20.191044675186276,
+    "Other (including conditioning and optimizer)": 0.9110533595085144
+  },
+  "cpu_data_profile": {
+    "torch_threads": 1,
+    "samples": [
+      {
+        "index": 100,
+        "seconds": 7.498146139085293,
+        "shape": [
+          3,
+          33,
+          544,
+          736
+        ]
+      },
+      {
+        "index": 1000,
+        "seconds": 7.469731964170933,
+        "shape": [
+          3,
+          33,
+          544,
+          736
+        ]
+      },
+      {
+        "index": 10000,
+        "seconds": 7.247534127905965,
+        "shape": [
+          3,
+          33,
+          544,
+          736
+        ]
+      },
+      {
+        "index": 50000,
+        "seconds": 7.315514482557774,
+        "shape": [
+          3,
+          33,
+          544,
+          736
+        ]
+      }
+    ],
+    "top_cumulative": [
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/datasets/droid_lerobot_dataset.py",
+        "line": 380,
+        "function": "__getitem__",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.18265608400000002,
+        "cumulative_seconds": 27.194779283000003
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/datasets/droid_lerobot_dataset.py",
+        "line": 306,
+        "function": "_compose_multi_view",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.13678292,
+        "cumulative_seconds": 23.973384508000002
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torch/nn/modules/module.py",
+        "line": 1774,
+        "function": "_wrapped_call_impl",
+        "primitive_calls": 4,
+        "calls": 16,
+        "self_seconds": 0.00024059800000000002,
+        "cumulative_seconds": 21.832436524000002
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torch/nn/modules/module.py",
+        "line": 1782,
+        "function": "_call_impl",
+        "primitive_calls": 4,
+        "calls": 16,
+        "self_seconds": 0.00037777400000000005,
+        "cumulative_seconds": 21.832319395000003
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/_transform.py",
+        "line": 57,
+        "function": "forward",
+        "primitive_calls": 12,
+        "calls": 12,
+        "self_seconds": 0.000551743,
+        "cumulative_seconds": 21.696567985
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/_transform.py",
+        "line": 47,
+        "function": "_call_kernel",
+        "primitive_calls": 24,
+        "calls": 24,
+        "self_seconds": 0.410159633,
+        "cumulative_seconds": 21.290159537
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/_container.py",
+        "line": 49,
+        "function": "forward",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.13495937900000002,
+        "cumulative_seconds": 21.180008620000002
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/_color.py",
+        "line": 156,
+        "function": "transform",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.403395451,
+        "cumulative_seconds": 18.823962063
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/functional/_color.py",
+        "line": 370,
+        "function": "adjust_hue_image",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 1.0489932450000001,
+        "cumulative_seconds": 12.730433279000001
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/datasets/action_sft_dataset.py",
+        "line": 44,
+        "function": "__getitem__",
+        "primitive_calls": 1,
+        "calls": 5,
+        "self_seconds": 0.206297947,
+        "cumulative_seconds": 7.497995901
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/functional/_color.py",
+        "line": 340,
+        "function": "_hsv_to_rgb",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 2.7970604910000003,
+        "cumulative_seconds": 6.417486491
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/functional/_color.py",
+        "line": 300,
+        "function": "_rgb_to_hsv",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 2.380173434,
+        "cumulative_seconds": 6.214165995
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torch/nn/functional.py",
+        "line": 4977,
+        "function": "interpolate",
+        "primitive_calls": 12,
+        "calls": 12,
+        "self_seconds": 0.0005381790000000001,
+        "cumulative_seconds": 3.550568956
+      },
+      {
+        "file": "/.uv/python_install/cpython-3.13.14-linux-x86_64-gnu/lib/python3.13/threading.py",
+        "line": 641,
+        "function": "wait",
+        "primitive_calls": 2,
+        "calls": 2,
+        "self_seconds": 0.126035274,
+        "cumulative_seconds": 2.733377902
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'mul' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 24,
+        "calls": 24,
+        "self_seconds": 2.6514774780000003,
+        "cumulative_seconds": 2.6514774780000003
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/_geometry.py",
+        "line": 164,
+        "function": "transform",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 3.4269e-05,
+        "cumulative_seconds": 2.5867055100000003
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/functional/_geometry.py",
+        "line": 283,
+        "function": "resize_image",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.000423487,
+        "cumulative_seconds": 2.586605811
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch._C._nn._upsample_bilinear2d_aa>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 2.585259776,
+        "cumulative_seconds": 2.585259776
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/datasets/cosmos3_action_lerobot.py",
+        "line": 756,
+        "function": "_fetch_sample",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.000291026,
+        "cumulative_seconds": 2.52491534
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/lerobot/datasets/lerobot_dataset.py",
+        "line": 1048,
+        "function": "__getitem__",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.0006010410000000001,
+        "cumulative_seconds": 2.524332997
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/lerobot/datasets/lerobot_dataset.py",
+        "line": 1014,
+        "function": "_query_videos",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.000378237,
+        "cumulative_seconds": 2.352168439
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/lerobot/datasets/video_utils.py",
+        "line": 46,
+        "function": "decode_video_frames",
+        "primitive_calls": 12,
+        "calls": 12,
+        "self_seconds": 0.0006976500000000001,
+        "cumulative_seconds": 2.343806216
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/lerobot/datasets/video_utils.py",
+        "line": 220,
+        "function": "decode_video_frames_torchcodec",
+        "primitive_calls": 12,
+        "calls": 12,
+        "self_seconds": 1.413604306,
+        "cumulative_seconds": 2.343108566
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch.stack>",
+        "primitive_calls": 56,
+        "calls": 56,
+        "self_seconds": 2.2679039160000003,
+        "cumulative_seconds": 2.2679039160000003
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/functional/_color.py",
+        "line": 92,
+        "function": "_blend",
+        "primitive_calls": 8,
+        "calls": 8,
+        "self_seconds": 0.00028135000000000004,
+        "cumulative_seconds": 1.5795274060000002
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'gather' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 1.53332603,
+        "cumulative_seconds": 1.53332603
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/utils/transforms.py",
+        "line": 769,
+        "function": "__call__",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.000292749,
+        "cumulative_seconds": 1.498080166
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/utils/transforms.py",
+        "line": 716,
+        "function": "_prepare_video",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.004256313,
+        "cumulative_seconds": 1.484754428
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/utils/transforms.py",
+        "line": 442,
+        "function": "__call__",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.00014304900000000002,
+        "cumulative_seconds": 1.480493805
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/utils/transforms.py",
+        "line": 135,
+        "function": "reflection_pad_to_target",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.00024985700000000003,
+        "cumulative_seconds": 1.4801683090000002
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/functional.py",
+        "line": 482,
+        "function": "pad",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.000123819,
+        "cumulative_seconds": 1.479549656
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/_functional_tensor.py",
+        "line": 375,
+        "function": "pad",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.147984426,
+        "cumulative_seconds": 1.4792057280000002
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch.cat>",
+        "primitive_calls": 28,
+        "calls": 28,
+        "self_seconds": 1.216586484,
+        "cumulative_seconds": 1.216586484
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/functional/_color.py",
+        "line": 149,
+        "function": "adjust_saturation_image",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.0001298,
+        "cumulative_seconds": 1.165225175
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/functional/_color.py",
+        "line": 188,
+        "function": "adjust_contrast_image",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.00036741700000000004,
+        "cumulative_seconds": 1.099257739
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'mul_' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 28,
+        "calls": 28,
+        "self_seconds": 1.0962936810000001,
+        "cumulative_seconds": 1.0962936810000001
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch._C._nn.upsample_bilinear2d>",
+        "primitive_calls": 8,
+        "calls": 8,
+        "self_seconds": 0.964514851,
+        "cumulative_seconds": 0.964514851
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'to' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 20,
+        "calls": 20,
+        "self_seconds": 0.8596817130000001,
+        "cumulative_seconds": 0.8596817130000001
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch.aminmax>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.8312228850000001,
+        "cumulative_seconds": 0.8312228850000001
+      },
+      {
+        "file": "/.uv/python_install/cpython-3.13.14-linux-x86_64-gnu/lib/python3.13/threading.py",
+        "line": 327,
+        "function": "wait",
+        "primitive_calls": 2,
+        "calls": 2,
+        "self_seconds": 0.165821708,
+        "cumulative_seconds": 0.8229649630000001
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torch/nn/functional.py",
+        "line": 5735,
+        "function": "pad",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.000142329,
+        "cumulative_seconds": 0.786235137
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch._C._nn.pad>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.786042409,
+        "cumulative_seconds": 0.786042409
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/functional/_color.py",
+        "line": 112,
+        "function": "adjust_brightness_image",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.000116738,
+        "cumulative_seconds": 0.781332098
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/datasets/cosmos3_action_lerobot.py",
+        "line": 997,
+        "function": "_build_result",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.00017451900000000001,
+        "cumulative_seconds": 0.7493814910000001
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/datasets/cosmos3_action_lerobot.py",
+        "line": 831,
+        "function": "_convert_video",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.35725229000000003,
+        "cumulative_seconds": 0.746847005
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torch/_ops.py",
+        "line": 874,
+        "function": "__call__",
+        "primitive_calls": 48,
+        "calls": 48,
+        "self_seconds": 0.00010117000000000001,
+        "cumulative_seconds": 0.703521594
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/functional/_color.py",
+        "line": 31,
+        "function": "_rgb_to_grayscale_image",
+        "primitive_calls": 8,
+        "calls": 8,
+        "self_seconds": 0.000262268,
+        "cumulative_seconds": 0.664268649
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchcodec/decoders/_video_decoder.py",
+        "line": 391,
+        "function": "get_frames_at",
+        "primitive_calls": 12,
+        "calls": 12,
+        "self_seconds": 0.000252906,
+        "cumulative_seconds": 0.6492788810000001
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchcodec/_core/ops.py",
+        "line": 313,
+        "function": "get_frames_at_indices",
+        "primitive_calls": 12,
+        "calls": 12,
+        "self_seconds": 0.00011277,
+        "cumulative_seconds": 0.648765157
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'remainder_' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 8,
+        "calls": 8,
+        "self_seconds": 0.596569533,
+        "cumulative_seconds": 0.596569533
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch.where>",
+        "primitive_calls": 8,
+        "calls": 8,
+        "self_seconds": 0.5810250610000001,
+        "cumulative_seconds": 0.5810250610000001
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'add_' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 48,
+        "calls": 48,
+        "self_seconds": 0.5335077570000001,
+        "cumulative_seconds": 0.5335077570000001
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torch/_tensor.py",
+        "line": 32,
+        "function": "wrapped",
+        "primitive_calls": 16,
+        "calls": 16,
+        "self_seconds": 0.000235686,
+        "cumulative_seconds": 0.457892067
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torch/_tensor.py",
+        "line": 1106,
+        "function": "__rsub__",
+        "primitive_calls": 16,
+        "calls": 16,
+        "self_seconds": 0.000132359,
+        "cumulative_seconds": 0.457622801
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch.rsub>",
+        "primitive_calls": 16,
+        "calls": 16,
+        "self_seconds": 0.45749044200000005,
+        "cumulative_seconds": 0.45749044200000005
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'clamp' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.320197748,
+        "cumulative_seconds": 0.320197748
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'clamp_' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 24,
+        "calls": 24,
+        "self_seconds": 0.278099478,
+        "cumulative_seconds": 0.278099478
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch.floor>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.2169666,
+        "cumulative_seconds": 0.2169666
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'add' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.211696777,
+        "cumulative_seconds": 0.211696777
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch.ones_like>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.19605039400000002,
+        "cumulative_seconds": 0.19605039400000002
+      }
+    ],
+    "top_self": [
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/functional/_color.py",
+        "line": 340,
+        "function": "_hsv_to_rgb",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 2.7970604910000003,
+        "cumulative_seconds": 6.417486491
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'mul' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 24,
+        "calls": 24,
+        "self_seconds": 2.6514774780000003,
+        "cumulative_seconds": 2.6514774780000003
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch._C._nn._upsample_bilinear2d_aa>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 2.585259776,
+        "cumulative_seconds": 2.585259776
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/functional/_color.py",
+        "line": 300,
+        "function": "_rgb_to_hsv",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 2.380173434,
+        "cumulative_seconds": 6.214165995
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch.stack>",
+        "primitive_calls": 56,
+        "calls": 56,
+        "self_seconds": 2.2679039160000003,
+        "cumulative_seconds": 2.2679039160000003
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'gather' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 1.53332603,
+        "cumulative_seconds": 1.53332603
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/lerobot/datasets/video_utils.py",
+        "line": 220,
+        "function": "decode_video_frames_torchcodec",
+        "primitive_calls": 12,
+        "calls": 12,
+        "self_seconds": 1.413604306,
+        "cumulative_seconds": 2.343108566
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch.cat>",
+        "primitive_calls": 28,
+        "calls": 28,
+        "self_seconds": 1.216586484,
+        "cumulative_seconds": 1.216586484
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'mul_' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 28,
+        "calls": 28,
+        "self_seconds": 1.0962936810000001,
+        "cumulative_seconds": 1.0962936810000001
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/functional/_color.py",
+        "line": 370,
+        "function": "adjust_hue_image",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 1.0489932450000001,
+        "cumulative_seconds": 12.730433279000001
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch._C._nn.upsample_bilinear2d>",
+        "primitive_calls": 8,
+        "calls": 8,
+        "self_seconds": 0.964514851,
+        "cumulative_seconds": 0.964514851
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'to' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 20,
+        "calls": 20,
+        "self_seconds": 0.8596817130000001,
+        "cumulative_seconds": 0.8596817130000001
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch.aminmax>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.8312228850000001,
+        "cumulative_seconds": 0.8312228850000001
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch._C._nn.pad>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.786042409,
+        "cumulative_seconds": 0.786042409
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'remainder_' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 8,
+        "calls": 8,
+        "self_seconds": 0.596569533,
+        "cumulative_seconds": 0.596569533
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch.where>",
+        "primitive_calls": 8,
+        "calls": 8,
+        "self_seconds": 0.5810250610000001,
+        "cumulative_seconds": 0.5810250610000001
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'add_' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 48,
+        "calls": 48,
+        "self_seconds": 0.5335077570000001,
+        "cumulative_seconds": 0.5335077570000001
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch.rsub>",
+        "primitive_calls": 16,
+        "calls": 16,
+        "self_seconds": 0.45749044200000005,
+        "cumulative_seconds": 0.45749044200000005
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/_transform.py",
+        "line": 47,
+        "function": "_call_kernel",
+        "primitive_calls": 24,
+        "calls": 24,
+        "self_seconds": 0.410159633,
+        "cumulative_seconds": 21.290159537
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/_color.py",
+        "line": 156,
+        "function": "transform",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.403395451,
+        "cumulative_seconds": 18.823962063
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/datasets/cosmos3_action_lerobot.py",
+        "line": 831,
+        "function": "_convert_video",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.35725229000000003,
+        "cumulative_seconds": 0.746847005
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'clamp' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.320197748,
+        "cumulative_seconds": 0.320197748
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'clamp_' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 24,
+        "calls": 24,
+        "self_seconds": 0.278099478,
+        "cumulative_seconds": 0.278099478
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch.floor>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.2169666,
+        "cumulative_seconds": 0.2169666
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'add' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.211696777,
+        "cumulative_seconds": 0.211696777
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/datasets/action_sft_dataset.py",
+        "line": 44,
+        "function": "__getitem__",
+        "primitive_calls": 1,
+        "calls": 5,
+        "self_seconds": 0.206297947,
+        "cumulative_seconds": 7.497995901
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch.ones_like>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.19605039400000002,
+        "cumulative_seconds": 0.19605039400000002
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/datasets/droid_lerobot_dataset.py",
+        "line": 380,
+        "function": "__getitem__",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.18265608400000002,
+        "cumulative_seconds": 27.194779283000003
+      },
+      {
+        "file": "/.uv/python_install/cpython-3.13.14-linux-x86_64-gnu/lib/python3.13/threading.py",
+        "line": 327,
+        "function": "wait",
+        "primitive_calls": 2,
+        "calls": 2,
+        "self_seconds": 0.165821708,
+        "cumulative_seconds": 0.8229649630000001
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'fmod_' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.151289093,
+        "cumulative_seconds": 0.151289093
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/_functional_tensor.py",
+        "line": 375,
+        "function": "pad",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.147984426,
+        "cumulative_seconds": 1.4792057280000002
+      },
+      {
+        "file": "/root/cosmos-framework/cosmos_framework/data/generator/action/datasets/droid_lerobot_dataset.py",
+        "line": 306,
+        "function": "_compose_multi_view",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.13678292,
+        "cumulative_seconds": 23.973384508000002
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/torchvision/transforms/v2/_container.py",
+        "line": 49,
+        "function": "forward",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.13495937900000002,
+        "cumulative_seconds": 21.180008620000002
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'sub_' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 16,
+        "calls": 16,
+        "self_seconds": 0.13232627600000002,
+        "cumulative_seconds": 0.13232627600000002
+      },
+      {
+        "file": "/.uv/python_install/cpython-3.13.14-linux-x86_64-gnu/lib/python3.13/threading.py",
+        "line": 641,
+        "function": "wait",
+        "primitive_calls": 2,
+        "calls": 2,
+        "self_seconds": 0.126035274,
+        "cumulative_seconds": 2.733377902
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'acquire' of '_thread.lock' objects>",
+        "primitive_calls": 11,
+        "calls": 11,
+        "self_seconds": 0.11545927600000001,
+        "cumulative_seconds": 0.11545927600000001
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<built-in method torch.tensor>",
+        "primitive_calls": 12688,
+        "calls": 12688,
+        "self_seconds": 0.051294002000000005,
+        "cumulative_seconds": 0.051294002000000005
+      },
+      {
+        "file": "/root/cosmos-framework/.venv/lib/python3.13/site-packages/datasets/formatting/formatting.py",
+        "line": 149,
+        "function": "extract_batch",
+        "primitive_calls": 36,
+        "calls": 36,
+        "self_seconds": 0.035035989000000003,
+        "cumulative_seconds": 0.035035989000000003
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'amin' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.0319216,
+        "cumulative_seconds": 0.0319216
+      },
+      {
+        "file": "~",
+        "line": 0,
+        "function": "<method 'amax' of 'torch._C.TensorBase' objects>",
+        "primitive_calls": 4,
+        "calls": 4,
+        "self_seconds": 0.029747512,
+        "cumulative_seconds": 0.029747512
+      }
+    ]
+  },
+  "loader": {
+    "workers_per_rank": 4,
+    "raw_loader_batch_size": 1,
+    "prefetch_factor": 2,
+    "nominal_prefetched_clips_per_rank": 8,
+    "packed_microbatch_per_rank": 32,
+    "async_packed_batch_builder": false
+  },
+  "cpu_quota_cores": 30.71999,
+  "profiling_method": "Synchronized wall-clock boundaries; step 1 warm-up, step 2 steady; timings averaged across two ranks. Backward includes FSDP communication and activation checkpoint recomputation. CPU sample profiling used one torch thread and four map-style dataset samples with augmentation unchanged."
+}

@@ -12,6 +12,7 @@ import torch
 import torch.distributed as dist
 from torch.distributed.tensor import DTensor
 
+from cosmos_framework.model.generator.robolab_droid_lora import is_generator_language_parameter
 from cosmos_framework.utils.callback import Callback
 
 
@@ -51,7 +52,7 @@ class RoboLabTrainingAudit(Callback):
             "trainable_names": sorted(self.adapter_hashes),
             "pruned_vs_full_model_parity": model.parity_report,
             "reasoning_parameters_present": [
-                n for n, _ in model.net.language_model.named_parameters() if "moe_gen" not in n
+                n for n, _ in model.net.language_model.named_parameters() if not is_generator_language_parameter(n)
             ],
             "resumed_at_iteration": iteration,
         }

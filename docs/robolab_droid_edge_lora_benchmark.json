@@ -1,0 +1,119 @@
+{
+  "selection": {
+    "model": "edge",
+    "global_batch_size": 128,
+    "per_device_batch_size": 32,
+    "gradient_accumulation_steps": 2,
+    "gpus": 2,
+    "optimizer_steps": 4000,
+    "memory_trials": [
+      {
+        "per_device_batch_size": 64,
+        "gradient_accumulation_steps": 1,
+        "returncode": 1,
+        "log": "/root/RoboLab/output/cosmos3_droid_demos/logs/edge_validation_20261103T061143Z_b64_a1.log",
+        "wall_seconds": 235.05926726013422,
+        "out_of_memory": true
+      },
+      {
+        "per_device_batch_size": 32,
+        "gradient_accumulation_steps": 2,
+        "returncode": 0,
+        "log": "/root/RoboLab/output/cosmos3_droid_demos/logs/edge_validation_20261103T061143Z_b32_a2.log",
+        "wall_seconds": 970.268640704453
+      }
+    ],
+    "validated_optimizer_steps": 5,
+    "checkpoint_resume_passed": true,
+    "validation_run": "/root/RoboLab/output/cosmos3_droid_demos/training_runs/robolab/cosmos3_droid_edge_lora/edge_validation_20261103T061143Z_b32_a2",
+    "estimated_full_run_seconds": 898038.6344963312,
+    "steady_optimizer_step_seconds": 224.49324106611311,
+    "gpu_peak_gib_by_rank": [
+      [
+        33.59174919128418,
+        41.763671875
+      ],
+      [
+        33.60340595245361,
+        41.962890625
+      ]
+    ],
+    "full_training_executed": false,
+    "continued_existing_validation": false,
+    "final_checks_audit": "/root/RoboLab/output/cosmos3_droid_demos/training_runs/robolab/cosmos3_droid_edge_lora/edge_validation_20261103T061143Z_b32_a2/training_audit.json",
+    "resume_log": "/root/RoboLab/output/cosmos3_droid_demos/logs/edge_validation_20261103T061143Z_b32_a2_resume.log"
+  },
+  "initial_steps": [
+    {
+      "iteration": 1,
+      "seconds_including_checkpoint": 244.09941872395575,
+      "loss": 2.041576623916626,
+      "actual_global_batch_size": 128
+    },
+    {
+      "iteration": 2,
+      "seconds_including_checkpoint": 225.90849999897182,
+      "loss": 2.6875410079956055,
+      "actual_global_batch_size": 128
+    },
+    {
+      "iteration": 3,
+      "seconds_including_checkpoint": 224.6418179385364,
+      "loss": 1.9503710269927979,
+      "actual_global_batch_size": 128
+    },
+    {
+      "iteration": 4,
+      "seconds_including_checkpoint": 225.19939084537327,
+      "loss": 1.9886682033538818,
+      "actual_global_batch_size": 128
+    }
+  ],
+  "checkpoint_saves": [
+    {
+      "iteration": 2,
+      "seconds": 1.4152589328587055
+    },
+    {
+      "iteration": 4,
+      "seconds": 1.196232695132494
+    }
+  ],
+  "resumed_steps": [
+    {
+      "iteration": 5,
+      "seconds_including_checkpoint": 240.67213010042906,
+      "loss": 2.112400531768799,
+      "actual_global_batch_size": 128
+    }
+  ],
+  "steady_range_seconds": [
+    224.00315815024078,
+    224.6418179385364
+  ],
+  "hardware": "2 x NVIDIA RTX A6000 48 GB",
+  "base_repository": "nvidia/Cosmos3-Edge-Policy-DROID",
+  "base_revision": "0110e64ca982589f1a3d856cbdd7d465dccb79bc",
+  "base_index_sha256": "504ed8bf62349b2d0b6a8923a76157b670585da026d00d4d82a667ab02d3afda",
+  "conditioning_count": 281,
+  "conditioning_seconds": 426.28973666392267,
+  "pruned_parity": {
+    "preds_vision": [
+      0.0
+    ],
+    "preds_action": [
+      0.0
+    ]
+  },
+  "frozen_weight_checks_passed": true,
+  "reasoning_parameters_present": [],
+  "adapter_groups_updated": {
+    "action2llm": true,
+    "llm2action": true,
+    "vae2llm": true,
+    "llm2vae": true,
+    "moe_gen": true
+  },
+  "nano_step_seconds": 353.1731923278421,
+  "nano_estimated_full_run_seconds": 1412788.9623630494
+}

@@ -2,6 +2,7 @@
 """Eight RoboLab tasks, cached text conditioning, shared generator LoRA."""
 
 import copy
+import os
 
 from hydra.core.config_store import ConfigStore
 
@@ -68,5 +69,9 @@ dataset.split_val_ratio = 0.0
 dataset.use_success_only = True
 dataset.use_image_augmentation = True
 r.trainer.callbacks.robolab_training_audit = L(RoboLabTrainingAudit)()
+if os.environ.get("COSMOS_DROID_PROFILE") == "1":
+    from cosmos_framework.callbacks.robolab_phase_profile import RoboLabPhaseProfile
+
+    r.trainer.callbacks.robolab_phase_profile = L(RoboLabPhaseProfile)()
 
 ConfigStore.instance().store(group="experiment", package="_global_", name="robolab_droid_lora", node=r)

@@ -19,12 +19,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--demos", type=Path, default=Path("/root/RoboLab/output/cosmos3_droid_demos"))
     parser.add_argument("--steps", type=int, default=4)
+    parser.add_argument("--model", choices=("nano", "edge"), default="nano")
     parser.add_argument(
         "--resume-validation-run",
         type=Path,
         help="Finish an interrupted validation after its measured steps and final checkpoint exist",
     )
     args = parser.parse_args()
+    prefix = "edge_" if args.model == "edge" else ""
+    recipe = "robolab_droid_edge_lora" if args.model == "edge" else "robolab_droid_lora"
+    group = "cosmos3_droid_edge_lora" if args.model == "edge" else "cosmos3_droid_lora"
     if not 3 <= args.steps <= 8:
         parser.error("Validation must use 3–8 optimizer steps, never the full run")
     repo = Path(__file__).resolve().parents[2]
@@ -52,20 +56,22 @@ def main():
         assert all(row["actual_global_batch_size"] == 128 for row in previous_audit["steps"])
         assert (run / f"checkpoints/iter_{args.steps:09d}/model/.metadata").is_file()
         assert (run / "checkpoints/latest_checkpoint.txt").read_text().strip() == f"iter_{args.steps:09d}"
-        attempts = json.loads((assets / "batch128_attempts.json").read_text())
+        attempts = json.loads((assets / f"{prefix}batch128_attempts.json").read_text())
         candidates = (previous_audit["per_device_batch_size"],)
         assert attempts[-1]["per_device_batch_size"] == candidates[0]
         assert all(row.get("out_of_memory") for row in attempts[:-1])
     for per_device in candidates:
         accumulation = 64 // per_device
         name = (
-            args.resume_validation_run.name if previous_audit else f"validation_{stamp}_b{per_device}_a{accumulation}"
+            args.resume_validation_run.name
+            if previous_audit
+            else f"{prefix}validation_{stamp}_b{per_device}_a{accumulation}"
         )
         log_path = logs / f"{name}.log"
         environment = dict(os.environ, ROBOLAB_DEMOS=str(args.demos), COSMOS_DROID_PER_DEVICE_BATCH=str(per_device))
         command = [
             "bash",
-            str(repo / "examples/launch_robolab_droid_lora.sh"),
+            str(repo / f"examples/launch_{recipe}.sh"),
             "--",
             f"job.name={name}",
             f"trainer.max_iter={args.steps}",
@@ -87,7 +93,7 @@ def main():
         }
         if not previous_audit:
             attempts.append(record)
-            (assets / "batch128_attempts.json").write_text(json.dumps(attempts, indent=2) + "\n")
+            (assets / f"{prefix}batch128_attempts.json").write_text(json.dumps(attempts, indent=2) + "\n")
         if result.returncode:
             message = log_path.read_text(errors="replace").lower()
             if (
@@ -97,11 +103,11 @@ def main():
             ):
                 raise RuntimeError(f"Non-memory training failure; fix it before continuing: {log_path}")
             record["out_of_memory"] = True
-            (assets / "batch128_attempts.json").write_text(json.dumps(attempts, indent=2) + "\n")
+            (assets / f"{prefix}batch128_attempts.json").write_text(json.dumps(attempts, indent=2) + "\n")
             print("OOM: halving device batch and doubling accumulation", flush=True)
             continue
         output_root = Path(environment.get("IMAGINAIRE_OUTPUT_ROOT", args.demos / "training_runs"))
-        run = output_root / "robolab/cosmos3_droid_lora" / name
+        run = output_root / "robolab" / group / name
         if previous_audit:
             assert run.resolve() == args.resume_validation_run.resolve()
         audit = previous_audit or json.loads((run / "training_audit.json").read_text())
@@ -127,6 +133,7 @@ def main():
         assert not resumed_audit["reasoning_parameters_present"]
         assert all(resumed_audit["adapter_loss_gradient_checks"].values())
         selection = {
+            "model": args.model,
             "global_batch_size": 128,
             "per_device_batch_size": per_device,
             "gradient_accumulation_steps": accumulation,
@@ -149,7 +156,7 @@ def main():
             "final_checks_audit": str(run / "training_audit.json"),
             "resume_log": str(resume_log),
         }
-        (assets / "batch128.json").write_text(json.dumps(selection, indent=2) + "\n")
+        (assets / f"{prefix}batch128.json").write_text(json.dumps(selection, indent=2) + "\n")
         print(json.dumps(selection, indent=2), flush=True)
         return
     raise RuntimeError("Even one sample/device ran out of memory; inspect the final log")

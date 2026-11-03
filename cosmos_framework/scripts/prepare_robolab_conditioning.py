@@ -127,9 +127,13 @@ def main():
     provenance_path = conditioning.parent / "provenance.json"
     if provenance_path.exists():
         provenance = json.loads(provenance_path.read_text())
-        provenance["conditioning_status"] = "complete"
-        provenance["conditioning_manifest"] = str(conditioning / "manifest.json")
-        provenance_path.write_text(json.dumps(provenance, indent=2) + "\n")
+        manifest_path = str(conditioning / "manifest.json")
+        # A second backbone has a separate cache; retain the dataset's original
+        # registered conditioning instead of silently replacing it.
+        if provenance.get("conditioning_manifest") in (None, manifest_path):
+            provenance["conditioning_status"] = "complete"
+            provenance["conditioning_manifest"] = manifest_path
+            provenance_path.write_text(json.dumps(provenance, indent=2) + "\n")
     print(f"Prepared {len(records)} conditions in {time.monotonic() - started:.1f}s", flush=True)
 
 

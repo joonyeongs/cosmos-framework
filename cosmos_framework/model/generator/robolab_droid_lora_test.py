@@ -19,12 +19,18 @@ from cosmos_framework.model.generator.mot.domain_aware_linear import DomainAware
 from cosmos_framework.model.generator.mot.inference_text_kv_memory import InferenceTextKVMemoryState, UndKVCache
 from cosmos_framework.model.generator.mot.inference_text_kv_memory_test import _gen_pack
 from cosmos_framework.model.generator.mot.modeling_utils import TimestepEmbedder
-from cosmos_framework.model.generator.mot.unified_mot import Qwen3VLMoTConfig, Qwen3VLTextForCausalLM
+from cosmos_framework.model.generator.mot.unified_mot import (
+    Nemotron3DenseVLMoTConfig,
+    Nemotron3DenseVLTextForCausalLM,
+    Qwen3VLMoTConfig,
+    Qwen3VLTextForCausalLM,
+)
 from cosmos_framework.model.generator.robolab_droid_lora import (
     CachedDroidLoRAModel,
     DomainLoRA,
     FrozenFloat32Linear,
     conditioning_items,
+    is_generator_language_parameter,
     load_released_weights,
     prune_understanding_on_meta,
 )
@@ -74,6 +80,20 @@ def test_pruning_native_nano_on_meta_removes_all_understanding_parameters():
     before = {n: p.shape for n, p in lm.named_parameters() if "moe_gen" in n}
     prune_understanding_on_meta(net)
     assert before
+    assert {n: p.shape for n, p in lm.named_parameters()} == before
+    assert all(p.device.type == "meta" for p in lm.parameters())
+
+
+def test_edge_pruning_preserves_generator_cross_attention_norm():
+    config_path = Path(__file__).parent / "reasoner/nemotron_3_dense_vl/configs/Nemotron-2B-Dense-VL.json"
+    config = Nemotron3DenseVLMoTConfig.from_json_file(json_file=str(config_path))
+    config.qk_norm_for_text = False
+    config.use_und_k_norm_for_gen = True
+    with torch.device("meta"):
+        lm = Nemotron3DenseVLTextForCausalLM(config)
+    before = {n: p.shape for n, p in lm.named_parameters() if is_generator_language_parameter(n)}
+    assert sum("k_norm_und_for_gen" in n for n in before) == 28
+    prune_understanding_on_meta(SimpleNamespace(language_model=lm))
     assert {n: p.shape for n, p in lm.named_parameters()} == before
     assert all(p.device.type == "meta" for p in lm.parameters())
 
