@@ -18,7 +18,8 @@ This is a 1.69× throughput improvement over the 224.5-second baseline.
 | Same plus prefetch factor 8 (selected) | 132.7 | 6.1 |
 
 Four steps tested color removal/normalization compilation, three tested replication,
-and three tested deeper prefetching: **10 real optimizer updates** in total. Every
+and three tested deeper prefetching: **10 real optimizer updates** across those
+three comparison runs. Every
 run passed finite-loss, actual global batch 128, video/action adapter-gradient
 updates and frozen-boundary checks; no reasoning parameters were loaded.
 
@@ -112,6 +113,33 @@ To reproduce that comparison, add
 `dataloader_train.dataloader.prefetch_factor=2` to the launch overrides. Use
 prefetch factor 2 for the sharded comparison too; the selected recipe now defaults
 to 8. The benchmark did not change activation checkpointing, batch size or LR.
+
+## Smaller batch / more accumulation comparison
+
+Global batch stays 128, on two GPUs with the original FSDP layout and the selected
+input optimizations. Full optimizer-step times include every accumulation step;
+each run excludes its first, warm-up step.
+
+| Samples/GPU | Accumulation | Steady seconds/optimizer step | Peak allocated GiB/GPU | Status |
+|---:|---:|---:|---:|---|
+| **32** | **2** | **132.7** | **33.6** | Selected; 3 steps, all audits passed |
+| 16 | 4 | 133.1 | 18.3 | 3 steps, all audits passed |
+| 8 | 8 | 133.3 | 14.0 | Stopped by user after 2 steps; only one steady sample |
+
+Smaller batches substantially reduced memory use without demonstrating a speed
+gain. The user selected **32 × 2** and requested stopping 8 × 8. That process was
+interrupted and both GPUs were verified idle. The interrupted run did not reach
+its final frozen-weight/adapter-update audit and is not treated as a completed
+validation. No additional training was started.
+
+The Edge TOML and experiment now default to 32 samples/GPU and accumulation 2;
+the launcher also falls back to 32 when no local validated selection file exists.
+Original parallelism remains unchanged. The separate memory-sweep validator still
+supports probing larger batches when explicitly run. The earlier 64 × 1 trial
+OOMed in the generator MLP while requesting 3.40 GiB; it predates the input
+optimizations and was not repeated in this sweep.
+
+[Raw batch-comparison measurements](robolab_droid_edge_batch_sweep.json).
 
 ## Relationship to the supplied RoboCasa commit
 

@@ -11,6 +11,8 @@ from cosmos_framework.data.generator.processors import build_processor_lazy
 from cosmos_framework.utils.lazy_config import LazyCall as L
 
 robolab_droid_edge_lora = copy.deepcopy(robolab_droid_lora)
+robolab_droid_edge_lora.dataloader_train.max_samples_per_batch = 32
+robolab_droid_edge_lora.trainer.grad_accum_iter = 2
 c = robolab_droid_edge_lora.model.config
 # Compile only the numerically validated normalization kernels; keep attention
 # and convolutions eager (whole-encoder compilation failed latent parity).

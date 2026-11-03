@@ -27,11 +27,11 @@ lr = 0.0001
 cycle_lengths = [4000]
 
 [dataloader_train]
-max_samples_per_batch = 64
+max_samples_per_batch = 32
 
 [trainer]
 max_iter = 4000
-grad_accum_iter = 1
+grad_accum_iter = 2
 logging_iter = 1
 
 [checkpoint]

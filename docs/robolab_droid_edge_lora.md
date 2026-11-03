@@ -74,6 +74,11 @@ bash examples/launch_robolab_droid_edge_lora.sh
 ```
 
 The launcher automatically reads the validated Edge batch configuration.
+The selected defaults are **32 samples/GPU × accumulation 2**, with two-way
+FSDP sharding and global batch 128. The TOML uses those defaults too; if the
+local selection file is absent, the launcher falls back to batch 32.
+Smaller-batch comparisons did not show a speed improvement; see the
+[batch comparison](robolab_droid_edge_optimization.md#smaller-batch--more-accumulation-comparison).
 `COSMOS_DROID_PER_DEVICE_BATCH` overrides it while preserving global batch 128.
 Other path overrides match the Nano launcher; Edge defaults select its own base,
 conditioning directory, experiment and output group.

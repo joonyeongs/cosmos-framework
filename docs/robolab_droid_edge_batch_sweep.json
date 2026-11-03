@@ -1,0 +1,642 @@
+{
+  "global_batch_size": 128,
+  "gpus": 2,
+  "parallelism": {
+    "data_parallel_shard_degree": 2,
+    "data_parallel_replicate_degree": 1
+  },
+  "selected_per_device_batch_size": 32,
+  "selected_gradient_accumulation_steps": 2,
+  "selection_reason": "User explicitly selected 32 x 2 and requested stopping 8 x 8.",
+  "full_training_executed": false,
+  "runs": [
+    {
+      "per_device_batch_size": 32,
+      "gradient_accumulation_steps": 2,
+      "run_directory": "/root/RoboLab/output/cosmos3_droid_demos/training_runs/robolab/cosmos3_droid_edge_lora/edge_prefetch8_profile_20261103",
+      "status": "completed",
+      "completed_optimizer_steps": 3,
+      "final_training_audit_completed": true,
+      "steady_optimizer_step_seconds": 132.67214840091765,
+      "steady_sample_count": 2,
+      "observed_steady_seconds_range": [
+        132.59195017255843,
+        132.75234662927687
+      ],
+      "gpu_peak_gib_by_rank": [
+        [
+          33.589356422424316,
+          41.9140625
+        ],
+        [
+          33.54151630401611,
+          40.23046875
+        ]
+      ],
+      "steps": [
+        {
+          "iteration": 1,
+          "seconds_including_checkpoint": 166.51276060193777,
+          "loss": 1.9958405494689941,
+          "actual_global_batch_size": 128
+        },
+        {
+          "iteration": 2,
+          "seconds_including_checkpoint": 132.75234662927687,
+          "loss": 2.749237537384033,
+          "actual_global_batch_size": 128
+        },
+        {
+          "iteration": 3,
+          "seconds_including_checkpoint": 132.59195017255843,
+          "loss": 1.9231292009353638,
+          "actual_global_batch_size": 128
+        }
+      ],
+      "checkpoint_saves": [
+        {
+          "iteration": 3,
+          "seconds": 2.2706098090857267,
+          "included_in_step_timing": false
+        }
+      ],
+      "phases_by_rank": [
+        [
+          {
+            "iteration": 1,
+            "wall_seconds": 166.26359235309064,
+            "seconds": {
+              "dataloader_wait": 20.736981753259897,
+              "vae_encode": 54.94092527963221,
+              "inputs_including_vae": 55.146444300189614,
+              "cached_conditioning": 0.6765999179333448,
+              "generator_forward": 20.449557166546583,
+              "loss_computation": 0.030196376144886017,
+              "forward_total": 76.51688219048083,
+              "backward_including_recompute_and_communication": 67.87848577089608,
+              "optimizer_update": 0.16433979384601116
+            },
+            "calls": {
+              "dataloader_wait": 2,
+              "vae_encode": 64,
+              "inputs_including_vae": 2,
+              "cached_conditioning": 2,
+              "generator_forward": 2,
+              "loss_computation": 2,
+              "forward_total": 2,
+              "backward_including_recompute_and_communication": 2,
+              "optimizer_update": 1
+            },
+            "loss": 1.9958405494689941,
+            "vision_tokens_last_microbatch": 97920,
+            "action_tokens_last_microbatch": 1056
+          },
+          {
+            "iteration": 2,
+            "wall_seconds": 132.75105001404881,
+            "seconds": {
+              "dataloader_wait": 0.12152929231524467,
+              "vae_encode": 44.05023654922843,
+              "inputs_including_vae": 44.16022395528853,
+              "cached_conditioning": 0.6271612551063299,
+              "generator_forward": 20.111944116652012,
+              "loss_computation": 0.029494725167751312,
+              "forward_total": 65.13423259556293,
+              "backward_including_recompute_and_communication": 67.43316767923534,
+              "optimizer_update": 0.02933426760137081
+            },
+            "calls": {
+              "dataloader_wait": 2,
+              "vae_encode": 64,
+              "inputs_including_vae": 2,
+              "cached_conditioning": 2,
+              "generator_forward": 2,
+              "loss_computation": 2,
+              "forward_total": 2,
+              "backward_including_recompute_and_communication": 2,
+              "optimizer_update": 1
+            },
+            "loss": 2.749237537384033,
+            "vision_tokens_last_microbatch": 97920,
+            "action_tokens_last_microbatch": 1056
+          },
+          {
+            "iteration": 3,
+            "wall_seconds": 132.5919640623033,
+            "seconds": {
+              "dataloader_wait": 0.12114779464900494,
+              "vae_encode": 44.02836927399039,
+              "inputs_including_vae": 44.13456874899566,
+              "cached_conditioning": 0.4926047530025244,
+              "generator_forward": 20.092471593990922,
+              "loss_computation": 0.028077881783246994,
+              "forward_total": 64.93985791318119,
+              "backward_including_recompute_and_communication": 67.47007259726524,
+              "optimizer_update": 0.02927216701209545
+            },
+            "calls": {
+              "dataloader_wait": 2,
+              "vae_encode": 64,
+              "inputs_including_vae": 2,
+              "cached_conditioning": 2,
+              "generator_forward": 2,
+              "loss_computation": 2,
+              "forward_total": 2,
+              "backward_including_recompute_and_communication": 2,
+              "optimizer_update": 1
+            },
+            "loss": 1.9231292009353638,
+            "vision_tokens_last_microbatch": 97920,
+            "action_tokens_last_microbatch": 1056
+          }
+        ],
+        [
+          {
+            "iteration": 1,
+            "wall_seconds": 166.38142578303814,
+            "seconds": {
+              "dataloader_wait": 20.643360225483775,
+              "vae_encode": 54.66920751519501,
+              "inputs_including_vae": 54.89402513578534,
+              "cached_conditioning": 0.613933926448226,
+              "generator_forward": 20.9658072181046,
+              "loss_computation": 0.03273816034197807,
+              "forward_total": 76.70933918468654,
+              "backward_including_recompute_and_communication": 67.89802581071854,
+              "optimizer_update": 0.16392257809638977
+            },
+            "calls": {
+              "dataloader_wait": 2,
+              "vae_encode": 64,
+              "inputs_including_vae": 2,
+              "cached_conditioning": 2,
+              "generator_forward": 2,
+              "loss_computation": 2,
+              "forward_total": 2,
+              "backward_including_recompute_and_communication": 2,
+              "optimizer_update": 1
+            },
+            "loss": 1.871048092842102,
+            "vision_tokens_last_microbatch": 97920,
+            "action_tokens_last_microbatch": 1056
+          },
+          {
+            "iteration": 2,
+            "wall_seconds": 132.75143954902887,
+            "seconds": {
+              "dataloader_wait": 0.11872291937470436,
+              "vae_encode": 43.92084668017924,
+              "inputs_including_vae": 44.03181192651391,
+              "cached_conditioning": 0.5459657367318869,
+              "generator_forward": 20.303251130506396,
+              "loss_computation": 0.028370326384902,
+              "forward_total": 65.11514917947352,
+              "backward_including_recompute_and_communication": 67.45204032026231,
+              "optimizer_update": 0.02910999022424221
+            },
+            "calls": {
+              "dataloader_wait": 2,
+              "vae_encode": 64,
+              "inputs_including_vae": 2,
+              "cached_conditioning": 2,
+              "generator_forward": 2,
+              "loss_computation": 2,
+              "forward_total": 2,
+              "backward_including_recompute_and_communication": 2,
+              "optimizer_update": 1
+            },
+            "loss": 2.3614513874053955,
+            "vision_tokens_last_microbatch": 97920,
+            "action_tokens_last_microbatch": 1056
+          },
+          {
+            "iteration": 3,
+            "wall_seconds": 132.59180502593517,
+            "seconds": {
+              "dataloader_wait": 0.11893374845385551,
+              "vae_encode": 43.957842169329524,
+              "inputs_including_vae": 44.063113471493125,
+              "cached_conditioning": 0.46021091006696224,
+              "generator_forward": 20.15624755062163,
+              "loss_computation": 0.029055429622530937,
+              "forward_total": 64.93322096392512,
+              "backward_including_recompute_and_communication": 67.48111226037145,
+              "optimizer_update": 0.028946461156010628
+            },
+            "calls": {
+              "dataloader_wait": 2,
+              "vae_encode": 64,
+              "inputs_including_vae": 2,
+              "cached_conditioning": 2,
+              "generator_forward": 2,
+              "loss_computation": 2,
+              "forward_total": 2,
+              "backward_including_recompute_and_communication": 2,
+              "optimizer_update": 1
+            },
+            "loss": 1.9027644395828247,
+            "vision_tokens_last_microbatch": 97920,
+            "action_tokens_last_microbatch": 1056
+          }
+        ]
+      ]
+    },
+    {
+      "per_device_batch_size": 16,
+      "gradient_accumulation_steps": 4,
+      "run_directory": "/root/RoboLab/output/cosmos3_droid_demos/training_runs/robolab/cosmos3_droid_edge_lora/edge_b16_a4_profile_20261103",
+      "status": "completed",
+      "completed_optimizer_steps": 3,
+      "final_training_audit_completed": true,
+      "steady_optimizer_step_seconds": 133.14277565386146,
+      "steady_sample_count": 2,
+      "observed_steady_seconds_range": [
+        133.02611142024398,
+        133.25943988747895
+      ],
+      "gpu_peak_gib_by_rank": [
+        [
+          18.320321559906006,
+          22.052734375
+        ],
+        [
+          18.306501865386963,
+          22.107421875
+        ]
+      ],
+      "steps": [
+        {
+          "iteration": 1,
+          "seconds_including_checkpoint": 154.1152846608311,
+          "loss": 2.155773162841797,
+          "actual_global_batch_size": 128
+        },
+        {
+          "iteration": 2,
+          "seconds_including_checkpoint": 133.02611142024398,
+          "loss": 2.056299924850464,
+          "actual_global_batch_size": 128
+        },
+        {
+          "iteration": 3,
+          "seconds_including_checkpoint": 133.25943988747895,
+          "loss": 1.9138603210449219,
+          "actual_global_batch_size": 128
+        }
+      ],
+      "checkpoint_saves": [
+        {
+          "iteration": 3,
+          "seconds": 2.9392007626593113,
+          "included_in_step_timing": false
+        }
+      ],
+      "phases_by_rank": [
+        [
+          {
+            "iteration": 1,
+            "wall_seconds": 153.87265479564667,
+            "seconds": {
+              "dataloader_wait": 8.311144709587097,
+              "vae_encode": 54.55798029527068,
+              "inputs_including_vae": 54.71637593396008,
+              "cached_conditioning": 0.5779651533812284,
+              "generator_forward": 20.867364140227437,
+              "loss_computation": 0.031742071732878685,
+              "forward_total": 76.43114804662764,
+              "backward_including_recompute_and_communication": 68.0623965729028,
+              "optimizer_update": 0.15420076064765453
+            },
+            "calls": {
+              "dataloader_wait": 4,
+              "vae_encode": 64,
+              "inputs_including_vae": 4,
+              "cached_conditioning": 4,
+              "generator_forward": 4,
+              "loss_computation": 4,
+              "forward_total": 4,
+              "backward_including_recompute_and_communication": 4,
+              "optimizer_update": 1
+            },
+            "loss": 2.155773162841797,
+            "vision_tokens_last_microbatch": 48960,
+            "action_tokens_last_microbatch": 528
+          },
+          {
+            "iteration": 2,
+            "wall_seconds": 133.02557911723852,
+            "seconds": {
+              "dataloader_wait": 0.12793935276567936,
+              "vae_encode": 43.941854644566774,
+              "inputs_including_vae": 44.05306082032621,
+              "cached_conditioning": 0.514929536730051,
+              "generator_forward": 20.45135923475027,
+              "loss_computation": 0.02973969280719757,
+              "forward_total": 65.24774635769427,
+              "backward_including_recompute_and_communication": 67.58106539770961,
+              "optimizer_update": 0.028568394482135773
+            },
+            "calls": {
+              "dataloader_wait": 4,
+              "vae_encode": 64,
+              "inputs_including_vae": 4,
+              "cached_conditioning": 4,
+              "generator_forward": 4,
+              "loss_computation": 4,
+              "forward_total": 4,
+              "backward_including_recompute_and_communication": 4,
+              "optimizer_update": 1
+            },
+            "loss": 2.056299924850464,
+            "vision_tokens_last_microbatch": 48960,
+            "action_tokens_last_microbatch": 528
+          },
+          {
+            "iteration": 3,
+            "wall_seconds": 133.25921634025872,
+            "seconds": {
+              "dataloader_wait": 0.12945860251784325,
+              "vae_encode": 43.935732727870345,
+              "inputs_including_vae": 44.06923273578286,
+              "cached_conditioning": 0.5076932329684496,
+              "generator_forward": 20.520832957699895,
+              "loss_computation": 0.030346766114234924,
+              "forward_total": 65.37686683237553,
+              "backward_including_recompute_and_communication": 67.68374910391867,
+              "optimizer_update": 0.028475364670157433
+            },
+            "calls": {
+              "dataloader_wait": 4,
+              "vae_encode": 64,
+              "inputs_including_vae": 4,
+              "cached_conditioning": 4,
+              "generator_forward": 4,
+              "loss_computation": 4,
+              "forward_total": 4,
+              "backward_including_recompute_and_communication": 4,
+              "optimizer_update": 1
+            },
+            "loss": 1.9138603210449219,
+            "vision_tokens_last_microbatch": 48960,
+            "action_tokens_last_microbatch": 528
+          }
+        ],
+        [
+          {
+            "iteration": 1,
+            "wall_seconds": 153.93981815874577,
+            "seconds": {
+              "dataloader_wait": 8.380922051146626,
+              "vae_encode": 54.900554306805134,
+              "inputs_including_vae": 55.10954079404473,
+              "cached_conditioning": 0.5235245432704687,
+              "generator_forward": 20.519530629739165,
+              "loss_computation": 0.030357705429196358,
+              "forward_total": 76.38573123328388,
+              "backward_including_recompute_and_communication": 68.09387396648526,
+              "optimizer_update": 0.15350456908345222
+            },
+            "calls": {
+              "dataloader_wait": 4,
+              "vae_encode": 64,
+              "inputs_including_vae": 4,
+              "cached_conditioning": 4,
+              "generator_forward": 4,
+              "loss_computation": 4,
+              "forward_total": 4,
+              "backward_including_recompute_and_communication": 4,
+              "optimizer_update": 1
+            },
+            "loss": 1.9395546913146973,
+            "vision_tokens_last_microbatch": 48960,
+            "action_tokens_last_microbatch": 528
+          },
+          {
+            "iteration": 2,
+            "wall_seconds": 133.0253276284784,
+            "seconds": {
+              "dataloader_wait": 0.12685898132622242,
+              "vae_encode": 44.37227647006512,
+              "inputs_including_vae": 44.485067553818226,
+              "cached_conditioning": 0.47584688290953636,
+              "generator_forward": 20.0328204408288,
+              "loss_computation": 0.031349821016192436,
+              "forward_total": 65.22406813688576,
+              "backward_including_recompute_and_communication": 67.60506883263588,
+              "optimizer_update": 0.028109660372138023
+            },
+            "calls": {
+              "dataloader_wait": 4,
+              "vae_encode": 64,
+              "inputs_including_vae": 4,
+              "cached_conditioning": 4,
+              "generator_forward": 4,
+              "loss_computation": 4,
+              "forward_total": 4,
+              "backward_including_recompute_and_communication": 4,
+              "optimizer_update": 1
+            },
+            "loss": 2.3908278942108154,
+            "vision_tokens_last_microbatch": 48960,
+            "action_tokens_last_microbatch": 528
+          },
+          {
+            "iteration": 3,
+            "wall_seconds": 133.2589848227799,
+            "seconds": {
+              "dataloader_wait": 0.12613449059426785,
+              "vae_encode": 44.39918099716306,
+              "inputs_including_vae": 44.51133228093386,
+              "cached_conditioning": 0.46689295768737793,
+              "generator_forward": 20.13474210165441,
+              "loss_computation": 0.0298478826880455,
+              "forward_total": 65.34080576710403,
+              "backward_including_recompute_and_communication": 67.72258695401251,
+              "optimizer_update": 0.02871520258486271
+            },
+            "calls": {
+              "dataloader_wait": 4,
+              "vae_encode": 64,
+              "inputs_including_vae": 4,
+              "cached_conditioning": 4,
+              "generator_forward": 4,
+              "loss_computation": 4,
+              "forward_total": 4,
+              "backward_including_recompute_and_communication": 4,
+              "optimizer_update": 1
+            },
+            "loss": 1.8593719005584717,
+            "vision_tokens_last_microbatch": 48960,
+            "action_tokens_last_microbatch": 528
+          }
+        ]
+      ]
+    },
+    {
+      "per_device_batch_size": 8,
+      "gradient_accumulation_steps": 8,
+      "run_directory": "/root/RoboLab/output/cosmos3_droid_demos/training_runs/robolab/cosmos3_droid_edge_lora/edge_b8_a8_profile_20261103",
+      "status": "stopped_by_user",
+      "completed_optimizer_steps": 2,
+      "final_training_audit_completed": false,
+      "steady_optimizer_step_seconds": 133.32453353144228,
+      "steady_sample_count": 1,
+      "observed_steady_seconds_range": [
+        133.32453353144228,
+        133.32453353144228
+      ],
+      "gpu_peak_gib_by_rank": [
+        [
+          14.020248889923096,
+          15.013671875
+        ],
+        [
+          14.020833492279053,
+          15.00390625
+        ]
+      ],
+      "steps": [
+        {
+          "iteration": 1,
+          "seconds_including_checkpoint": 149.2719912044704,
+          "loss": 1.878722906112671,
+          "actual_global_batch_size": 128
+        },
+        {
+          "iteration": 2,
+          "seconds_including_checkpoint": 133.32453353144228,
+          "loss": 2.0105979442596436,
+          "actual_global_batch_size": 128
+        }
+      ],
+      "checkpoint_saves": [],
+      "phases_by_rank": [
+        [
+          {
+            "iteration": 1,
+            "wall_seconds": 148.92129658348858,
+            "seconds": {
+              "dataloader_wait": 2.710211778059602,
+              "vae_encode": 54.53080634586513,
+              "inputs_including_vae": 54.74679172411561,
+              "cached_conditioning": 0.677217161282897,
+              "generator_forward": 20.70442804135382,
+              "loss_computation": 0.033801257610321045,
+              "forward_total": 76.55775779485703,
+              "backward_including_recompute_and_communication": 68.53898718394339,
+              "optimizer_update": 0.15180903673171997
+            },
+            "calls": {
+              "dataloader_wait": 8,
+              "vae_encode": 64,
+              "inputs_including_vae": 8,
+              "cached_conditioning": 8,
+              "generator_forward": 8,
+              "loss_computation": 8,
+              "forward_total": 8,
+              "backward_including_recompute_and_communication": 8,
+              "optimizer_update": 1
+            },
+            "loss": 1.878722906112671,
+            "vision_tokens_last_microbatch": 24480,
+            "action_tokens_last_microbatch": 264
+          },
+          {
+            "iteration": 2,
+            "wall_seconds": 133.32401660643518,
+            "seconds": {
+              "dataloader_wait": 0.13715113513171673,
+              "vae_encode": 44.166146041825414,
+              "inputs_including_vae": 44.27851763740182,
+              "cached_conditioning": 0.5200668182224035,
+              "generator_forward": 20.19200381077826,
+              "loss_computation": 0.03242771700024605,
+              "forward_total": 65.23928247019649,
+              "backward_including_recompute_and_communication": 67.85994650237262,
+              "optimizer_update": 0.028158778324723244
+            },
+            "calls": {
+              "dataloader_wait": 8,
+              "vae_encode": 64,
+              "inputs_including_vae": 8,
+              "cached_conditioning": 8,
+              "generator_forward": 8,
+              "loss_computation": 8,
+              "forward_total": 8,
+              "backward_including_recompute_and_communication": 8,
+              "optimizer_update": 1
+            },
+            "loss": 2.0105979442596436,
+            "vision_tokens_last_microbatch": 24480,
+            "action_tokens_last_microbatch": 264
+          }
+        ],
+        [
+          {
+            "iteration": 1,
+            "wall_seconds": 149.21501255221665,
+            "seconds": {
+              "dataloader_wait": 2.77539549395442,
+              "vae_encode": 54.93338035605848,
+              "inputs_including_vae": 55.103957721963525,
+              "cached_conditioning": 0.5828936025500298,
+              "generator_forward": 20.78776370547712,
+              "loss_computation": 0.033471640199422836,
+              "forward_total": 76.77226911112666,
+              "backward_including_recompute_and_communication": 68.57287266477942,
+              "optimizer_update": 0.15884384140372276
+            },
+            "calls": {
+              "dataloader_wait": 8,
+              "vae_encode": 64,
+              "inputs_including_vae": 8,
+              "cached_conditioning": 8,
+              "generator_forward": 8,
+              "loss_computation": 8,
+              "forward_total": 8,
+              "backward_including_recompute_and_communication": 8,
+              "optimizer_update": 1
+            },
+            "loss": 2.1738476753234863,
+            "vision_tokens_last_microbatch": 24480,
+            "action_tokens_last_microbatch": 264
+          },
+          {
+            "iteration": 2,
+            "wall_seconds": 133.32384836114943,
+            "seconds": {
+              "dataloader_wait": 0.13571850024163723,
+              "vae_encode": 44.283447878435254,
+              "inputs_including_vae": 44.394731640815735,
+              "cached_conditioning": 0.48434443213045597,
+              "generator_forward": 20.044731134548783,
+              "loss_computation": 0.03248859569430351,
+              "forward_total": 65.19136265479028,
+              "backward_including_recompute_and_communication": 67.91025847010314,
+              "optimizer_update": 0.027843423187732697
+            },
+            "calls": {
+              "dataloader_wait": 8,
+              "vae_encode": 64,
+              "inputs_including_vae": 8,
+              "cached_conditioning": 8,
+              "generator_forward": 8,
+              "loss_computation": 8,
+              "forward_total": 8,
+              "backward_including_recompute_and_communication": 8,
+              "optimizer_update": 1
+            },
+            "loss": 2.4610862731933594,
+            "vision_tokens_last_microbatch": 24480,
+            "action_tokens_last_microbatch": 264
+          }
+        ]
+      ]
+    }
+  ],
+  "earlier_64_x_1_trial": {
+    "result": "CUDA OOM in generator LoRA MLP; requested 3.40 GiB",
+    "log": "/root/RoboLab/output/cosmos3_droid_demos/logs/edge_validation_20261103T061143Z_b64_a1.log",
+    "note": "Predates latest input optimizations; not rerun."
+  }
+}

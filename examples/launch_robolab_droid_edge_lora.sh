@@ -19,7 +19,7 @@ if [[ -z "$PER_DEVICE_BATCH" ]]; then
 import json,sys
 from pathlib import Path
 p=Path(sys.argv[1])
-print(json.loads(p.read_text())['per_device_batch_size'] if p.exists() else 64)
+print(json.loads(p.read_text())['per_device_batch_size'] if p.exists() else 32)
 PY
 )"
 fi
