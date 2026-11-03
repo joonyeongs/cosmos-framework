@@ -19,7 +19,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--demos", type=Path, default=Path("/root/RoboLab/output/cosmos3_droid_demos"))
     parser.add_argument("--steps", type=int, default=4)
-    parser.add_argument("--model", choices=("nano", "edge"), default="nano")
+    parser.add_argument("--model", choices=("edge", "nano"), default="edge")
     parser.add_argument(
         "--resume-validation-run",
         type=Path,
@@ -27,7 +27,7 @@ def main():
     )
     args = parser.parse_args()
     prefix = "edge_" if args.model == "edge" else ""
-    recipe = "robolab_droid_edge_lora" if args.model == "edge" else "robolab_droid_lora"
+    recipe = "robolab_droid_edge_lora" if args.model == "edge" else "robolab_droid_nano_lora"
     group = "cosmos3_droid_edge_lora" if args.model == "edge" else "cosmos3_droid_lora"
     if not 3 <= args.steps <= 8:
         parser.error("Validation must use 3–8 optimizer steps, never the full run")

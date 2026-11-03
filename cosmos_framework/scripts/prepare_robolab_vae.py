@@ -48,7 +48,7 @@ def vae_key(key):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--checkpoint", type=Path, default=Path("/root/checkpoints/Cosmos3-Nano-Policy-DROID"))
+    parser.add_argument("--checkpoint", type=Path, default=Path("/root/checkpoints/Cosmos3-Edge-Policy-DROID"))
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.output.exists():

@@ -4,7 +4,7 @@ See the [executed benchmark results](robolab_droid_edge_lora_results.md) for
 measured step times and the projected full-run duration.
 
 This recipe uses the same 200 demonstrations and training settings as
-[the Nano recipe](robolab_droid_lora.md): two RTX A6000 48 GB GPUs, global
+[the Nano recipe](robolab_droid_nano_lora.md): two RTX A6000 48 GB GPUs, global
 batch 128, BF16, full activation checkpointing, generator-only LoRA rank 16 /
 alpha 32, native video/action losses and random crop/rescale, and a 4,000-step
 linear learning-rate schedule. No full training run is launched by validation.

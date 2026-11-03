@@ -1,130 +1,90 @@
-# RoboLab DROID generator LoRA
+# RoboLab DROID training — Edge by default
 
-This feature uses 200 successful RoboLab demonstrations: 25 per selected task,
-one shared adapter, and no held-out validation. Both repositories use branch
-`feature/robolab-cosmos3-droid-lora-demos`.
+Use **nvidia/Cosmos3-Edge-Policy-DROID** for the 200 successful RoboLab demos.
+The generic launch/preparation commands and generic TOML now select Edge.
+The Nano code, recipe and conditioning remain available as explicit alternatives.
 
-## Data and preparation
+| Setting | Edge default |
+|---|---|
+| Shared adapter | Generator video/action LoRA, rank 16, alpha 32 |
+| Frozen components | Base weights; reasoning conditioning precomputed, reasoning branch absent during training |
+| Data | 25 successful demos per task, 8 tasks, all 200 used for training |
+| Batch | 32 samples/GPU × 2 GPUs × accumulation 2 = global batch 128 |
+| Parallelism | Original two-way FSDP sharding |
+| Schedule | 4,000 optimizer steps, LR 0.0001 linearly decaying to zero |
+| Images | Random crop retained, color augmentation disabled |
+| Input speedups | Compiled VAE encoder norms; 4 workers/GPU, prefetch factor 8 |
+| Measured runtime | 132.7 seconds/step; about 147.4 hours (6.1 days) for 4,000 steps on two A6000 48 GB GPUs |
 
-The dataset root is `/root/RoboLab/output/cosmos3_droid_demos`. Original HDF5
-episodes and three 640×360, 15 Hz camera videos live under its `original/`
-directory. The exported LeRobot v3 root is
-`train_ready/droid_plus_lerobot_640x360_20260412/success` beneath the dataset root.
-The native DROID loader reads raw absolute joint actions and robot state, and
-composes wrist/left/right views. Random crop/rescale remains enabled; ColorJitter
-is disabled per the updated request. All 200 episodes participate in training; the
-loader's normal complete 33-image/32-action windows are used.
-Historical Nano timings below predate color removal; the updated Nano throughput
-has not been remeasured.
+The time estimate comes from short executed benchmarks, not a full fine-tuning
+run. See the [measurements](robolab_droid_edge_optimization.md).
 
-After collection and export, run from `/root/cosmos-framework`:
+## Download and launch on another server
 
-```bash
-bash examples/prepare_robolab_droid.sh
-```
+Clone this repository's `feature/robolab-cosmos3-droid-lora-demos` branch.
+Install its training environment using [setup.md](setup.md); the measured stack
+used Python 3.13 and PyTorch 2.13/cu130. Keep this environment separate from OpenPI.
 
-Preparation converts the bundled Wan2.2 VAE by a checked key mapping and lossless
-FP32 storage conversion for the native distributed loader (runtime compute
-remains BF16), and
-precomputes text K/V using the released
-`/root/checkpoints/Cosmos3-Nano-Policy-DROID` weights. It covers every task's
-native JSON prompt, all possible idle-frame-count variants, and the null CFG
-condition. It performs no optimizer steps. A local full-model fixture and
-cached/full-path comparisons check video and action output parity. Preparation
-loads the frozen understanding branch once; training removes its modules on
-the meta device before materializing or reading their weights. The tokenizer
-is still used to identify cached prompts.
-
-The installed PyTorch 2.13 environment originally contained a Transformer Engine
-extension built for PyTorch 2.10. Its TE 2.12 framework extension can be rebuilt
-against the installed PyTorch while retaining the bundled CUDA core:
+From the repository root, after authenticating with Hugging Face:
 
 ```bash
-.venv/bin/python -m cosmos_framework.scripts.prepare_robolab_optimizer
-```
-
-This helper verifies the pinned official source archive, backs up the original
-extension, and checks a native fused Adam CUDA update with BF16 parameters and
-FP32 master weights. It records the source and binary hashes under
-`training_assets/dependencies/optimizer_extension_repair.json`. Run it again if
-an environment refresh restores the incompatible extension; the launcher checks
-the optimizer import before starting. The build follows NVIDIA's
-[Transformer Engine source-build guidance](https://docs.nvidia.com/deeplearning/transformer-engine/installation.html).
-
-## Requested batch-size test
-
-After all 200 successful demos have been collected, exported, and conditioned:
-
-```bash
-.venv/bin/python -m cosmos_framework.scripts.validate_robolab_training
-```
-
-The test starts with **64 samples per GPU, two GPUs, accumulation 1**. Only an
-out-of-memory failure triggers the next setting: 32×2, 16×4, 8×8, 4×16, 2×32,
-then 1×64 per GPU. Every setting has global batch 128. Other errors stop the
-sweep for investigation. The first fitting setting runs four optimizer steps,
-saves adapter checkpoints, and resumes for one further step. It does not run
-the full 4,000-step job.
-
-If a validation is interrupted after its four measured steps and final
-checkpoint exist, `--resume-validation-run <absolute-run-directory>` preserves
-those measurements and finishes the one-step resume check. Original failure
-logs remain intact. The final audit checks updates across the union of FSDP
-shards: DROID uses eight of the model's 64 action output dimensions, so a shard
-containing only padded dimensions legitimately has no action-output update.
-Frozen-weight changes on either rank still fail the check on both ranks.
-
-`training_assets/batch128.json` is written only after the test and resume pass.
-It records the selected batch/accumulation, GPU memory, log paths, measured
-optimizer-step time, and the estimated duration of a 4,000-step run. Timing
-includes gradient accumulation, data-loading gaps, and callbacks; the first
-step is excluded from the steady-state estimate. Startup and 16 scheduled
-adapter saves are added. This is a short-run estimate, not a completed full
-training result or an evaluation of the fine-tuned policy's success rate.
-
-The completed validation on 2026-11-02 used two RTX A6000 48 GB GPUs. Both
-64/device × accumulation 1 and 32/device × accumulation 2 ran out of memory.
-**16/device × 2 GPUs × accumulation 4 = global batch 128** completed four
-measured optimizer steps and one restored step. All five video/action adapter
-groups updated, checked frozen weights stayed unchanged, and no understanding
-parameters were loaded. The measured steady step was 353.2 seconds, giving a
-4,000-step estimate of **392.4 hours (16.4 days)**. All 200 successful demos are
-available in both formats. See the
-[completed report](/root/RoboLab/policies/scripted/demos/REPORT.md) for per-task
-counts, collection rates, replay limits, memory, and validation evidence.
-
-## Ready-to-run full training
-
-Once validation is complete, the user can run:
-
-```bash
+export TRANSFER_ROOT="$HOME/robolab-transfer"
+export ROBOLAB_DEMOS="$TRANSFER_ROOT/data/cosmos3_droid_demos"
+export COSMOS_DROID_MODEL=edge
+export COSMOS_DROID_CHECKPOINT="$TRANSFER_ROOT/checkpoints/Cosmos3-Edge-Policy-DROID"
+export COSMOS_DROID_CONDITIONING="$ROBOLAB_DEMOS/train_ready/conditioning_edge"
+export WAN_VAE_PATH="$ROBOLAB_DEMOS/training_assets/wan22_native.pth"
+export COSMOS_DROID_PER_DEVICE_BATCH=32
+hf download joonyeongs/robolab-droid-200 --repo-type dataset \
+  --local-dir "$TRANSFER_ROOT/data"
+hf download nvidia/Cosmos3-Edge-Policy-DROID \
+  --revision 0110e64ca982589f1a3d856cbdd7d465dccb79bc \
+  --local-dir "$COSMOS_DROID_CHECKPOINT" \
+  --include '*.json' '*.jinja' 'transformer/*' 'text_tokenizer/*' 'vae/*'
+# The matching Edge conditioning cache is included in the dataset.
+# Convert the bundled VAE once if its native file is not already present:
+if [[ ! -f "$WAN_VAE_PATH" ]]; then
+  COSMOS_DEVICE=cpu .venv/bin/python -m cosmos_framework.scripts.prepare_robolab_vae \
+    --checkpoint "$COSMOS_DROID_CHECKPOINT" --output "$WAN_VAE_PATH"
+fi
+.venv/bin/python -m cosmos_framework.scripts.prepare_robolab_optimizer \
+  --build-root "$ROBOLAB_DEMOS/training_assets/dependencies"
+bash examples/launch_robolab_droid_lora.sh --dryrun
+# Start the full run only when ready:
 bash examples/launch_robolab_droid_lora.sh
 ```
 
-The launcher uses the validated batch configuration automatically. Before a
-validated selection exists, its default remains the requested first trial
-(64/device, accumulation 1). `COSMOS_DROID_PER_DEVICE_BATCH` can explicitly
-override that choice; accumulation is computed to preserve global batch 128.
-The launcher verifies the 200-episode quota and complete conditioning first.
-`--dryrun` resolves configuration without constructing a GPU model.
+The generic launcher dispatches to `launch_robolab_droid_edge_lora.sh` by default.
+Its explicit Edge counterpart remains available. The generic TOML
+`examples/toml/sft_config/robolab_droid_lora.toml` also selects Edge. Runtime paths
+are set by the environment variables above; historical reports contain source
+machine paths. Dataset selection metadata is in `training_defaults.json`.
 
-The full recipe is 4,000 **optimizer** steps with rank-16, alpha-32, zero-dropout
-LoRA; learning rate 0.0001 decays linearly to zero. Native AdamW settings,
-gradient clipping, video/action flow-matching objectives, and random crop/rescale
-are retained. Only generator attention/MLP projections, video input/output
-projections, and action input/output adapters train. All pretrained base weights,
-including DROID action boundaries, stay frozen. EMA is disabled, full activation
-checkpointing is enabled, and BF16 generator parameters use two-GPU FSDP2.
+To regenerate Edge conditioning, use `bash examples/prepare_robolab_droid.sh`.
+This requires loading the reasoning branch once; ordinary cached training does
+not. See the [Edge guide](robolab_droid_edge_lora.md) for encoder parity checks,
+short training validation and checkpoint details. The memory-sweep validator
+now defaults to Edge; `--model nano` explicitly selects Nano. It deliberately
+probes 64/device first and is optional for the already selected 32 × 2 setup.
 
-Checkpoints are adapter-only DCP plus optimizer/scheduler state every 250 steps;
-the base checkpoint is loaded again on resume. Re-running against the same job
-directory resumes it. These adapter checkpoints are not standalone full HF
-models. `training_audit.json` records actual samples per optimizer step, frozen
-boundary checks, changed adapter groups, absence of understanding parameters,
-parity results, timings, and per-rank memory peaks.
+## Nano remains available
 
-Environment overrides: `ROBOLAB_DEMOS`, `COSMOS_DROID_CHECKPOINT`, `DROID_ROOT`,
-`COSMOS_DROID_CONDITIONING`, `WAN_VAE_PATH`, `IMAGINAIRE_OUTPUT_ROOT`,
-`CUDA_VISIBLE_DEVICES`, and `COSMOS_PYTHON`. Shell launchers preserve the user's
-library-path settings. The fine-tuning validation is the end of this task;
-the full training run requires a later user request.
+Use the [Nano guide](robolab_droid_nano_lora.md) and the explicit commands:
+
+```bash
+export COSMOS_DROID_MODEL=nano
+export COSMOS_DROID_CHECKPOINT="$TRANSFER_ROOT/checkpoints/Cosmos3-Nano-Policy-DROID"
+export COSMOS_DROID_CONDITIONING="$ROBOLAB_DEMOS/train_ready/conditioning"
+export COSMOS_DROID_PER_DEVICE_BATCH=16
+# If needed, regenerate Nano's cache using the matching Nano checkpoint:
+bash examples/prepare_robolab_droid_nano.sh
+# Or use the already included Nano conditioning cache:
+bash examples/launch_robolab_droid_nano_lora.sh --dryrun
+```
+
+The Nano TOML is `examples/toml/sft_config/robolab_droid_nano_lora.toml`.
+`COSMOS_DROID_MODEL=nano` also routes the generic shell commands to Nano.
+The original internal Nano experiment name, `robolab_droid_lora`, is retained for
+compatibility; the public generic TOML now selects `robolab_droid_edge_lora`.
+Switch checkpoint, conditioning path and batch together when changing models.
+OpenPI's separate dataset and π0.5 training configuration are unchanged.

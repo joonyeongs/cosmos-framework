@@ -13,6 +13,13 @@
 
 # Cosmos-Framework
 
+**RoboLab DROID fine-tuning in this fork defaults to Cosmos3-Edge-Policy-DROID.**
+Use the [Edge-first training guide](docs/robolab_droid_lora.md) with the
+[200-demo dataset](https://huggingface.co/datasets/joonyeongs/robolab-droid-200).
+The selected setup is 32 samples/GPU × two GPUs × accumulation 2 (global batch
+128), generator video/action LoRA, and 4,000 optimizer steps. The
+[Nano recipe](docs/robolab_droid_nano_lora.md) remains available for later use.
+
 **Cosmos-Framework** is an end-to-end framework for training and serving world models, including the **Cosmos3** model family. Everything lives in a single top-level [`cosmos_framework/`](./cosmos_framework) Python package:
 
 - **Training** — distributed FSDP / TP / CP / PP trainer, native DCP checkpoints with HuggingFace `safetensors` import/export, JSONL / WebDataset / LeRobot dataset adapters. Entry point: `cosmos_framework.scripts.train`. See [`docs/training.md`](./docs/training.md).

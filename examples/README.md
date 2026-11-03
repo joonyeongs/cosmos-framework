@@ -12,6 +12,11 @@ For the Sim-Bimanual Stage 0–3 recipes, [check the local training bundle](../d
 
 ## Recipe → launch shell
 
+For the RoboLab 200-demo dataset, `launch_robolab_droid_lora.sh` defaults to
+**Edge** (32/GPU × accumulation 2, global batch 128). Use
+`launch_robolab_droid_nano_lora.sh` or `COSMOS_DROID_MODEL=nano` to select the
+retained Nano recipe. See the [RoboLab training guide](../docs/robolab_droid_lora.md).
+
 | Recipe                                       | Launch shell                          |
 | -------------------------------------------- | ------------------------------------- |
 | Vision SFT (Cosmos3-Nano)                    | `launch_sft_vision_nano.sh`           |

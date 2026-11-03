@@ -1,9 +1,10 @@
+# Default RoboLab policy: Edge. Nano remains in robolab_droid_nano_lora.toml.
 # Shared LoRA for the 200 successful RoboLab demonstrations; all used for training.
 [job]
 task = "vfm"
-experiment = "robolab_droid_lora"
+experiment = "robolab_droid_edge_lora"
 project = "robolab"
-group = "cosmos3_droid_lora"
+group = "cosmos3_droid_edge_lora"
 name = "eight_tasks"
 wandb_mode = "disabled"
 
@@ -27,11 +28,11 @@ lr = 0.0001
 cycle_lengths = [4000]
 
 [dataloader_train]
-max_samples_per_batch = 64
+max_samples_per_batch = 32
 
 [trainer]
 max_iter = 4000
-grad_accum_iter = 1
+grad_accum_iter = 2
 logging_iter = 1
 
 [checkpoint]
