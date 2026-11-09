@@ -307,6 +307,8 @@ class RobolabPolicyConfig:
     action_space: ActionSpace = "joint_pos"
     use_state: bool = True
     history_length: int = 1
+    # False only for the four fine-tuned checkpoints listed in RobolabServerArgs.flip_gripper.
+    flip_gripper: bool = True
 
 
 class RobolabServerArgs(pydantic.BaseModel):
@@ -333,6 +335,8 @@ class RobolabServerArgs(pydantic.BaseModel):
     """Action domain name passed to get_domain_id()."""
     decode_video: bool = False
     """If set, decode and return the predicted rollout video as a uint8 NumPy array."""
+    flip_gripper: bool = True
+    """Map the gripper as 1 - value between RoboLab (0=open) and the model. Keep the default (True) for the released Cosmos3-Nano/Edge-Policy-DROID checkpoints and for any new model. Pass --no-flip-gripper ONLY for the four evaluated fine-tuned checkpoints whose training data already stored the gripper inverted (1=open; robolab-droid-200 / cosmos3-edge-failure-prevention-200): Cosmos3-Edge-Policy-DROID-robolab-lora-r16-a32-2k, -robolab-full-ft-2k, -failure-prevention-lora-r16-a32-2k, -failure-prevention-full-ft-2k. For any other model, change this only when explicitly instructed to."""
 
     output_dir: Path | None = None
     """Output directory for OmniInference. Defaults to /tmp/cosmos3_action_server/robolab."""
@@ -461,6 +465,7 @@ class RobolabPolicyService:
             action_space=args.action_space,
             use_state=bool(args.use_state),
             history_length=int(args.history_length),
+            flip_gripper=bool(args.flip_gripper),
         )
         if self.cfg.history_length < (1 if self.cfg.use_state else 0):
             raise ValueError("--history-length must be >= 1 when --use-state is true")
@@ -589,7 +594,9 @@ class RobolabPolicyService:
         )  # [T,D]
         history_action: torch.Tensor | None = None
         num_history_rows = self.cfg.history_length - use_state_rows
-        gripper_position = 1.0 - _ensure_gripper_array(obs["observation/gripper_position"])
+        gripper_position = _ensure_gripper_array(obs["observation/gripper_position"])
+        if self.cfg.flip_gripper:
+            gripper_position = 1.0 - gripper_position
 
         if self.cfg.action_space == "joint_pos":
             joint_position = _ensure_2d_float_array(obs["observation/joint_position"], "observation/joint_position", 7)
@@ -664,7 +671,8 @@ class RobolabPolicyService:
         action = samples["action"][0][:, : self.cfg.action_dim]  # [T,D]
         action = action[self.cfg.history_length :]  # [T2,D]
         action_np = action.detach().cpu().numpy()  # [T2,D]
-        action_np[:, -1] = 1.0 - action_np[:, -1]
+        if self.cfg.flip_gripper:
+            action_np[:, -1] = 1.0 - action_np[:, -1]
 
         if self.cfg.action_space == "midtrain":
             eef_pos = _ensure_2d_float_array(obs["observation/eef_pos"], "observation/eef_pos", 3)
