@@ -34,6 +34,33 @@ fi
 ACCUMULATION=$((GLOBAL_BATCH / (2 * PER_DEVICE_BATCH)))
 EXTRA_ARGS=()
 TAIL_OVERRIDES=("dataloader_train.max_samples_per_batch=$PER_DEVICE_BATCH" "trainer.grad_accum_iter=$ACCUMULATION")
+PROVENANCE="$DROID_ROOT/../provenance.json"
+if [[ ! -f "$PROVENANCE" ]]; then
+    PROVENANCE="$ROBOLAB_DEMOS/train_ready/provenance.json"
+fi
+PHASE_STEPS="$("$PYTHON" - "$PROVENANCE" "$DROID_ROOT" "$GLOBAL_BATCH" <<'PY'
+import json,sys
+from pathlib import Path
+p,root,batch=Path(sys.argv[1]),Path(sys.argv[2]),int(sys.argv[3])
+plan=json.loads(p.read_text()) if p.is_file() else {}
+if plan.get('start_range_column') == 'training_start_ranges':
+    import pyarrow.parquet as pq
+
+    paths=sorted((root/'success/meta/episodes').glob('*/*.parquet'))
+    if not paths or any('training_start_ranges' not in pq.read_schema(path).names for path in paths):
+        raise ValueError('The privileged-phase recipe requires training_start_ranges in episode metadata')
+    if plan['future_frames'] != 32 or not plan['eligible_starts']:
+        raise ValueError('Expected nonempty privileged-phase windows for the 32-step Edge recipe')
+    baseline=plan['baseline']
+    print(max(1, round(baseline['optimizer_steps'] * plan['eligible_starts'] * baseline['global_batch']
+                       / (baseline['eligible_starts'] * batch))))
+PY
+)"
+if [[ -n "$PHASE_STEPS" ]]; then
+    PHASE_WARMUP=$(((PHASE_STEPS + 10) / 20))
+    TAIL_OVERRIDES+=("job.name=privileged_phases" "trainer.max_iter=$PHASE_STEPS"
+        "scheduler.cycle_lengths=[$PHASE_STEPS]" "scheduler.warm_up_steps=[$PHASE_WARMUP]")
+fi
 IN_TAIL=false
 for ARG in "$@"; do
     if [[ "$ARG" == "--" ]]; then
@@ -51,15 +78,21 @@ if ! "$PYTHON" -c 'import transformer_engine.pytorch; from cosmos_framework.util
     echo 'Optimizer extension unavailable. Run: .venv/bin/python -m cosmos_framework.scripts.prepare_robolab_optimizer' >&2
     exit 2
 fi
-"$PYTHON" - "$ROBOLAB_DEMOS" "$COSMOS_DROID_CONDITIONING" <<'PY'
+"$PYTHON" - "$PROVENANCE" "$COSMOS_DROID_CONDITIONING" <<'PY'
 import json,sys
 from pathlib import Path
-p=Path(sys.argv[1])
-provenance=json.loads((p/'train_ready/provenance.json').read_text())
-assert len(provenance['counts']) == 8 and set(provenance['counts'].values()) == {25}, 'Need 25 successful demos for each of eight tasks'
+provenance=json.loads(Path(sys.argv[1]).read_text())
+phase_training=provenance.get('start_range_column') == 'training_start_ranges'
+expected_dataset_tasks=6 if phase_training else 8
+assert len(provenance['counts']) == expected_dataset_tasks and set(provenance['counts'].values()) == {25}, 'Need 25 successful demos per dataset task'
 assert provenance['validation_episodes'] == 0
 cache=Path(sys.argv[2])/'manifest.json'
 assert cache.exists() and json.loads(cache.read_text())['complete'], 'Precompute conditioning first'
+if phase_training:
+    prompts=json.loads((cache.parent/'prompts.json').read_text())
+    expected={text.strip().rstrip('.') for text in provenance['training_instructions']}
+    actual={text.strip().rstrip('.') for text in prompts['task_instructions']}
+    assert actual == expected, 'Conditioning cache must match the sampled tasks'
 PY
 exec "$PYTHON" -m torch.distributed.run --standalone --nproc-per-node=2 \
     -m cosmos_framework.scripts.train --sft-toml "$SFT_TOML" "${EXTRA_ARGS[@]}" -- "${TAIL_OVERRIDES[@]}"

@@ -7,9 +7,28 @@ import pytest
 import torch
 import torchvision.transforms.v2 as T
 
+from cosmos_framework.data.generator.action.datasets.cosmos3_action_lerobot import build_episode_spans
 from cosmos_framework.data.generator.action.datasets.droid_lerobot_dataset import DROIDLeRobotDataset
 
 _IMAGE_FEATURES = {"wrist": "wrist_key", "left": "left_key", "right": "right_key"}
+
+
+@pytest.mark.L0
+@pytest.mark.parametrize(
+    ("stride", "expected"),
+    [(1, [(1, 23, 3), (1, 34, 1)]), (2, [(1, 24, 1), (1, 34, 1)])],
+)
+def test_training_start_ranges_limit_only_the_initial_observation(stride, expected):
+    episodes = {
+        "dataset_from_index": [0, 20],
+        "dataset_to_index": [20, 40],
+        "length": [20, 20],
+        "training_start_ranges": [[], [[3, 6], [14, 20]]],
+    }
+    spans, count, raw_frames = build_episode_spans(episodes, [0, 1], chunk_length=5, sample_stride=stride)
+    assert spans == expected
+    assert count == sum(span[2] for span in expected)
+    assert raw_frames == 40
 
 
 def _dataset(use_image_augmentation: bool, jitter_after_compose: bool = False) -> DROIDLeRobotDataset:

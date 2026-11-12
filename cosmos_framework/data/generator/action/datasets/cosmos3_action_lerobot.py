@@ -248,6 +248,10 @@ def build_episode_spans(
 ) -> tuple[list[tuple[int, int, int]], int, int]:
     """Build valid episode spans for LeRobot frame queries.
 
+    An optional ``training_start_ranges`` episode metadata column restricts
+    the first observation to sorted, disjoint half-open episode-local ranges.
+    The future window can extend past a range, up to the episode boundary.
+
     Returns:
         - episode spans as ``(episode_id, sample_start, valid_len)``
         - total valid sample count across selected episodes
@@ -258,6 +262,8 @@ def build_episode_spans(
     dataset_from_index = list(episodes["dataset_from_index"])
     dataset_to_index = list(episodes["dataset_to_index"])
     length = list(episodes["length"])
+    columns = getattr(episodes, "column_names", episodes)
+    start_ranges = list(episodes["training_start_ranges"]) if "training_start_ranges" in columns else None
 
     spans: list[tuple[int, int, int]] = []
     valid_count = 0
@@ -265,11 +271,26 @@ def build_episode_spans(
     for episode_id in episode_ids:
         start = dataset_from_index[episode_id]
         stop = dataset_to_index[episode_id]
-        raw_valid_len = stop - start - chunk_length
-        if raw_valid_len > 0:
-            valid_len = (raw_valid_len + sample_stride - 1) // sample_stride
-            spans.append((episode_id, start, valid_len))
-            valid_count += valid_len
+        episode_length = stop - start
+        valid_stop = max(0, episode_length - chunk_length)
+        if start_ranges is None:
+            ranges = [(0, valid_stop)] if valid_stop else []
+        else:
+            ranges = start_ranges[episode_id]
+            if ranges is None:
+                raise ValueError(f"Missing training_start_ranges for episode {episode_id}")
+        previous_stop = 0
+        for first, last in ranges:
+            if not previous_stop <= first < last <= episode_length:
+                raise ValueError(f"Invalid training_start_ranges for episode {episode_id}: {ranges!r}")
+            previous_stop = last
+            # Preserve the stride grid measured from the episode's first row.
+            first += (-first) % sample_stride
+            last = min(last, valid_stop)
+            if first < last:
+                valid_len = (last - first + sample_stride - 1) // sample_stride
+                spans.append((episode_id, start + first, valid_len))
+                valid_count += valid_len
         sample_count += int(length[episode_id])
 
     return spans, valid_count, sample_count

@@ -204,6 +204,8 @@ class DROIDLeRobotDataset(BaseActionLeRobotDataset):
         if not self._use_filter_dict:
             super()._append_index_records(meta=meta, ds_idx=ds_idx, dataset_label=dataset_label)
             return
+        if "training_start_ranges" in getattr(meta.episodes, "column_names", meta.episodes):
+            raise ValueError("The legacy DROID filter cannot be combined with training_start_ranges")
 
         episode_ids = split_episode_ids(
             total_episodes=meta.total_episodes,
