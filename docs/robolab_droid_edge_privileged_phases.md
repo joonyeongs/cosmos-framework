@@ -34,8 +34,10 @@ CUDA_VISIBLE_DEVICES=0,1 bash examples/launch_robolab_droid_edge_lora.sh
 
 For generator full fine-tuning, set `COSMOS_DROID_TOML=examples/toml/sft_config/robolab_droid_edge_full.toml` when invoking the launcher. On GPUs that need a smaller microbatch, reduce `COSMOS_DROID_PER_DEVICE_BATCH`. The launcher increases accumulation to preserve global batch 64. Use a distinct output root or job name for each independent run.
 
+The launcher reads the selected budget of **500 optimizer steps** from the dataset provenance. It uses 25 warmup steps and retains the learning rate from the selected recipe.
+
 ## Matching the previous training exposure
 
-The [pinned dataset revision](https://huggingface.co/datasets/joonyeongs/cosmos3-edge-failure-prevention-200/tree/3fb6ca0f79e9fcecdc9e7a648cdf5ab1096223be) used by the 2,000-step run at global batch 64 contains 131,146 eligible starts across eight tasks. The new launcher matches that exposure with `round(2,000 × 37,516 / 131,146) = 572` steps. It sets a 572-step schedule with 29 warmup steps and retains the original recipe's learning rate. This is about 0.976 passes' worth of sampled starts in each run.
+The [pinned dataset revision](https://huggingface.co/datasets/joonyeongs/cosmos3-edge-failure-prevention-200/tree/3fb6ca0f79e9fcecdc9e7a648cdf5ab1096223be) used by the 2,000-step run at global batch 64 contains 131,146 eligible starts across eight tasks. Matching that exposure would take `round(2,000 × 37,516 / 131,146) = 572` steps. The selected 500 steps correspond to about 0.853 passes' worth of sampled starts at the same batch size.
 
-Restricting the historical dataset to the same six exported tasks gives 92,009 starts. Matching that six-task reference at the same global batch takes 815 steps. To use that reference, add `-- trainer.max_iter=815 'scheduler.cycle_lengths=[815]' 'scheduler.warm_up_steps=[41]'` to the training launcher.
+Restricting the historical dataset to the same six exported tasks gives 92,009 starts. Matching that six-task reference at the same global batch would take 815 steps.

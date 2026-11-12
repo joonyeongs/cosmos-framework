@@ -38,10 +38,10 @@ PROVENANCE="$DROID_ROOT/../provenance.json"
 if [[ ! -f "$PROVENANCE" ]]; then
     PROVENANCE="$ROBOLAB_DEMOS/train_ready/provenance.json"
 fi
-PHASE_STEPS="$("$PYTHON" - "$PROVENANCE" "$DROID_ROOT" "$GLOBAL_BATCH" <<'PY'
+PHASE_STEPS="$("$PYTHON" - "$PROVENANCE" "$DROID_ROOT" <<'PY'
 import json,sys
 from pathlib import Path
-p,root,batch=Path(sys.argv[1]),Path(sys.argv[2]),int(sys.argv[3])
+p,root=map(Path,sys.argv[1:])
 plan=json.loads(p.read_text()) if p.is_file() else {}
 if plan.get('start_range_column') == 'training_start_ranges':
     import pyarrow.parquet as pq
@@ -51,9 +51,10 @@ if plan.get('start_range_column') == 'training_start_ranges':
         raise ValueError('The privileged-phase recipe requires training_start_ranges in episode metadata')
     if plan['future_frames'] != 32 or not plan['eligible_starts']:
         raise ValueError('Expected nonempty privileged-phase windows for the 32-step Edge recipe')
-    baseline=plan['baseline']
-    print(max(1, round(baseline['optimizer_steps'] * plan['eligible_starts'] * baseline['global_batch']
-                       / (baseline['eligible_starts'] * batch))))
+    steps=plan['optimizer_steps']
+    if type(steps) is not int or steps < 1:
+        raise ValueError('Expected a positive optimizer step count in provenance.json')
+    print(steps)
 PY
 )"
 if [[ -n "$PHASE_STEPS" ]]; then
