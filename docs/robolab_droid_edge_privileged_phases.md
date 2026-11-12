@@ -16,7 +16,7 @@ Each privileged-code interval is extended by ten frames at each end. Overlapping
 
 ## Two-GPU launch
 
-Install the training environment and stage the base checkpoint as described in [the Edge recipe](robolab_droid_edge_lora.md). Authenticate Hugging Face on the training server to download the private dataset. Use a fresh conditioning directory for these four task prompts.
+Install the training environment and stage the base checkpoint as described in [the Edge recipe](robolab_droid_edge_lora.md). The LeRobot video reader needs FFmpeg shared libraries compatible with TorchCodec. Authenticate Hugging Face on the training server to download the private dataset. Use a fresh conditioning directory for these four task prompts.
 
 ```bash
 export ROBOLAB_DEMOS="$HOME/datasets/cosmos3-edge-harness-privileged-phases-150"
