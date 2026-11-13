@@ -26,10 +26,17 @@ def main():
     parser.add_argument("--sft-toml", default="examples/toml/sft_config/robolab_droid_lora.toml")
     parser.add_argument("--metadata-only", action="store_true")
     parser.add_argument("--expected-tasks", type=int, default=8)
+    parser.add_argument(
+        "--replay-sources",
+        default="",
+        help="Comma-separated source labels (e.g. cosmos3) whose replay windows also need text conditioning",
+    )
     args = parser.parse_args()
+    replay = [f"dataloader_train.dataloader.datasets.droid.dataset.replay_sources={args.replay_sources}"]
     config = load_experiment_from_toml(
         args.sft_toml,
-        extra_overrides=[
+        extra_overrides=(replay if args.replay_sources else [])
+        + [
             "model.precompute_only=true",
             "model.config.parallelism.data_parallel_shard_degree=1",
             "model.config.parallelism.data_parallel_replicate_degree=1",

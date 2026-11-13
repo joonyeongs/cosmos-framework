@@ -105,8 +105,14 @@ class DROIDLeRobotDataset(BaseActionLeRobotDataset):
         apply_forward_clamp: bool = False,
         jitter_after_compose: bool = False,
         use_color_augmentation: bool = True,
+        # Optional replay pool from ``source_intervals`` (e.g. "cosmos3"); see
+        # BaseActionLeRobotDataset. None keeps privileged-only start ranges.
+        replay_sources: str | list[str] | None = None,
+        replay_padding_frames: int = 10,
     ) -> None:
         """ """
+        if replay_sources and use_filter_dict:
+            raise ValueError("replay_sources cannot be combined with the legacy DROID filter")
         super().__init__(
             fps=fps,
             chunk_length=chunk_length,
@@ -122,6 +128,8 @@ class DROIDLeRobotDataset(BaseActionLeRobotDataset):
             apply_forward_clamp=apply_forward_clamp,
             tolerance_s=tolerance_s,
             enable_fast_init=enable_fast_init,
+            replay_sources=replay_sources,
+            replay_padding_frames=replay_padding_frames,
         )
         self._use_success_only = use_success_only
         self._video_mode = video_mode

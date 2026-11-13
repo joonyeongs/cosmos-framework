@@ -12,7 +12,9 @@ These helpers centralize common behavior across Action wrappers:
 
 from __future__ import annotations
 
+import ast
 import importlib
+import json
 import logging as _logging
 import math
 import os as _os
@@ -245,12 +247,15 @@ def build_episode_spans(
     episode_ids: Sequence[int],
     chunk_length: int,
     sample_stride: int = 1,
+    start_ranges: Sequence[Any] | dict[int, Any] | None = None,
 ) -> tuple[list[tuple[int, int, int]], int, int]:
     """Build valid episode spans for LeRobot frame queries.
 
     An optional ``training_start_ranges`` episode metadata column restricts
     the first observation to sorted, disjoint half-open episode-local ranges.
     The future window can extend past a range, up to the episode boundary.
+    ``start_ranges`` (indexed by episode id) replaces that column when given;
+    the Cosmos3-phase replay pool uses it to reuse the same span rules.
 
     Returns:
         - episode spans as ``(episode_id, sample_start, valid_len)``
@@ -263,7 +268,8 @@ def build_episode_spans(
     dataset_to_index = list(episodes["dataset_to_index"])
     length = list(episodes["length"])
     columns = getattr(episodes, "column_names", episodes)
-    start_ranges = list(episodes["training_start_ranges"]) if "training_start_ranges" in columns else None
+    if start_ranges is None and "training_start_ranges" in columns:
+        start_ranges = list(episodes["training_start_ranges"])
 
     spans: list[tuple[int, int, int]] = []
     valid_count = 0
@@ -294,6 +300,92 @@ def build_episode_spans(
         sample_count += int(length[episode_id])
 
     return spans, valid_count, sample_count
+
+
+def parse_source_intervals(value: Any) -> list[dict[str, Any]]:
+    """Return per-step action-source intervals from episode metadata.
+
+    The RoboLab hybrid export stores ``source_intervals`` as a list of
+    ``{"source", "phase", "node", "start", "stop"}`` records. Depending on the
+    writer it arrives as a list, a JSON string or a Python-literal string;
+    literals are parsed with :func:`ast.literal_eval`, never ``eval``.
+    """
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except json.JSONDecodeError:
+            value = ast.literal_eval(value)
+    intervals = list(value or [])
+    for interval in intervals:
+        if not {"source", "start", "stop"} <= set(interval):
+            raise ValueError(f"Malformed source interval: {interval!r}")
+    return intervals
+
+
+def _merge_ranges(ranges: Sequence[tuple[int, int]]) -> list[tuple[int, int]]:
+    merged: list[tuple[int, int]] = []
+    for first, last in sorted(ranges):
+        if first >= last:
+            continue
+        if merged and first <= merged[-1][1]:
+            merged[-1] = (merged[-1][0], max(merged[-1][1], last))
+        else:
+            merged.append((first, last))
+    return merged
+
+
+def _subtract_ranges(ranges: Sequence[tuple[int, int]], excluded: Sequence[tuple[int, int]]) -> list[tuple[int, int]]:
+    result: list[tuple[int, int]] = []
+    excluded = _merge_ranges(excluded)
+    for first, last in _merge_ranges(ranges):
+        cursor = first
+        for cut_first, cut_last in excluded:
+            if cut_last <= cursor or cut_first >= last:
+                continue
+            if cut_first > cursor:
+                result.append((cursor, cut_first))
+            cursor = max(cursor, cut_last)
+            if cursor >= last:
+                break
+        if cursor < last:
+            result.append((cursor, last))
+    return result
+
+
+def replay_start_ranges(
+    episodes: Any, episode_ids: Sequence[int], sources: Sequence[str], padding: int = 0
+) -> dict[int, list[tuple[int, int]]]:
+    """First-observation ranges for steps recorded from ``sources``.
+
+    Builds the replay pool from the ``source_intervals`` metadata: each matching
+    interval is widened by ``padding`` frames on both sides (clipped to the
+    episode) and overlapping intervals are merged, like the export's padding of
+    privileged intervals. Starts already eligible through
+    ``training_start_ranges`` are then removed so no window is in both pools.
+    The returned ranges are sorted, disjoint and episode-local;
+    :func:`build_episode_spans` applies the usual future-window bound.
+    """
+    if padding < 0:
+        raise ValueError(f"padding must be >= 0, got {padding}")
+    columns = getattr(episodes, "column_names", episodes)
+    for column in ("source_intervals", "training_start_ranges"):
+        if column not in columns:
+            raise ValueError(f"Source replay requires the {column!r} episode metadata column")
+    wanted = set(sources)
+    intervals = list(episodes["source_intervals"])
+    primary = list(episodes["training_start_ranges"])
+    length = list(episodes["length"])
+    result: dict[int, list[tuple[int, int]]] = {}
+    for episode_id in episode_ids:
+        episode_length = int(length[episode_id])
+        picked = [
+            (max(0, int(item["start"]) - padding), min(episode_length, int(item["stop"]) + padding))
+            for item in parse_source_intervals(intervals[episode_id])
+            if item["source"] in wanted
+        ]
+        excluded = [(int(first), int(last)) for first, last in (primary[episode_id] or [])]
+        result[episode_id] = _subtract_ranges(picked, excluded)
+    return result
 
 
 def _normalize_split(split: str) -> str:
@@ -348,6 +440,8 @@ class BaseActionLeRobotDataset(Dataset):
         enable_fast_init: bool = False,
         fast_init_max_workers: int = 64,
         min_episode_length_frames: int | None = None,
+        replay_sources: str | Sequence[str] | None = None,
+        replay_padding_frames: int = 10,
     ) -> None:
         super().__init__()
         _ensure_hf_hub_offline()
@@ -400,6 +494,15 @@ class BaseActionLeRobotDataset(Dataset):
             # Subclasses that override ``_append_index_records`` are expected
             # to honor this attribute themselves.
             self._min_episode_length_frames: int | None = min_episode_length_frames
+            # Optional second pool of first observations taken from the
+            # ``source_intervals`` steps recorded by these action sources
+            # (e.g. "cosmos3"). Off by default. ``get_shuffle_block_pools``
+            # exposes the two pools so the streaming sampler can mix them.
+            if isinstance(replay_sources, str):
+                replay_sources = [name.strip() for name in replay_sources.split(",")]
+            self._replay_sources: tuple[str, ...] = tuple(name for name in (replay_sources or ()) if name)
+            # Same ten-frame padding the export applies to privileged intervals.
+            self._replay_padding_frames = int(replay_padding_frames)
             self._delta_timestamps: dict[str, list[float]] = {}
             self._to_opencv: np.ndarray | dict[str, np.ndarray] = np.eye(3, dtype=np.float32)
 
@@ -427,6 +530,9 @@ class BaseActionLeRobotDataset(Dataset):
             # _episode_cum_ends[i] = running total of valid_len through span i
             #   Used for O(log N) lookup via bisect_right in _resolve_index.
             self._episode_records: list[tuple[int, int, int, int]] = []
+            # Indices into ``_episode_records`` of replay-pool spans; every
+            # other span (including ones appended by subclasses) is primary.
+            self._replay_span_ids: set[int] = set()
             self._episode_cum_ends: list[int] = []
             self._num_valid_indices = 0
             self._domain_id = get_domain_id(self._embodiment_type)
@@ -595,6 +701,37 @@ class BaseActionLeRobotDataset(Dataset):
             )
 
         for episode_id, sample_start, valid_len in episode_spans:
+            self._episode_records.append((ds_idx, sample_start, valid_len, episode_id))
+            self._num_valid_indices += valid_len
+            self._episode_cum_ends.append(self._num_valid_indices)
+
+        if not self._replay_sources:
+            return
+        # Replay pool: starts inside steps recorded from ``replay_sources``
+        # that are not already primary starts. Appended after the primary
+        # spans, so flat indices of the primary pool are unchanged.
+        replay_spans, replay_count, _ = build_episode_spans(
+            episodes=meta.episodes,
+            episode_ids=episode_ids,
+            chunk_length=self._chunk_length,
+            sample_stride=self._sample_stride,
+            start_ranges=replay_start_ranges(
+                meta.episodes, episode_ids, self._replay_sources, padding=self._replay_padding_frames
+            ),
+        )
+        if self._min_episode_length_frames is not None:
+            length_lookup = list(meta.episodes["length"])
+            replay_spans = [
+                span for span in replay_spans if int(length_lookup[span[0]]) >= self._min_episode_length_frames
+            ]
+            replay_count = sum(span[2] for span in replay_spans)
+        log.info(
+            f"{class_name}{label}: replay sources {list(self._replay_sources)} "
+            f"(padding {self._replay_padding_frames}) add {replay_count} starts "
+            f"in {len(replay_spans)} spans"
+        )
+        for episode_id, sample_start, valid_len in replay_spans:
+            self._replay_span_ids.add(len(self._episode_records))
             self._episode_records.append((ds_idx, sample_start, valid_len, episode_id))
             self._num_valid_indices += valid_len
             self._episode_cum_ends.append(self._num_valid_indices)
@@ -1079,3 +1216,18 @@ class BaseActionLeRobotDataset(Dataset):
                 blocks.append((prev, c - prev))
             prev = c
         return blocks
+
+    def get_shuffle_block_pools(self) -> tuple[list[tuple[int, int]], list[tuple[int, int]]]:
+        """``get_shuffle_blocks`` split into ``(primary, replay)`` pools.
+
+        The replay pool is empty unless ``replay_sources`` is set. Spans
+        appended by subclasses that do not tag a pool count as primary.
+        """
+        pools: tuple[list[tuple[int, int]], list[tuple[int, int]]] = ([], [])
+        prev = 0
+        for i, c in enumerate(self._episode_cum_ends):
+            c = int(c)
+            if c > prev:
+                pools[int(i in self._replay_span_ids)].append((prev, c - prev))
+            prev = c
+        return pools

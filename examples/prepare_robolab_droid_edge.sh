@@ -14,5 +14,11 @@ if [[ ! -f "$WAN_VAE_PATH" ]]; then
     COSMOS_DEVICE=cpu "$PYTHON" -m cosmos_framework.scripts.prepare_robolab_vae \
         --checkpoint "$COSMOS_DROID_CHECKPOINT" --output "$WAN_VAE_PATH"
 fi
+PREPARE_ARGS=()
+if [[ "${COSMOS_DROID_COSMOS3_REPLAY:-0}" == 1 ]]; then
+    # Cosmos3-phase replay adds Canned Food and Toy windows: prepare with --expected-tasks 6.
+    PREPARE_ARGS+=(--replay-sources cosmos3)
+fi
 exec "$PYTHON" -m torch.distributed.run --standalone --nproc-per-node=1 \
-    -m cosmos_framework.scripts.prepare_robolab_conditioning --sft-toml examples/toml/sft_config/robolab_droid_edge_lora.toml "$@"
+    -m cosmos_framework.scripts.prepare_robolab_conditioning --sft-toml examples/toml/sft_config/robolab_droid_edge_lora.toml \
+    "${PREPARE_ARGS[@]}" "$@"

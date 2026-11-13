@@ -15,6 +15,7 @@ to ``RankPartitionedDataLoader`` (mirroring how the vision recipe uses
 
 from __future__ import annotations
 
+from fractions import Fraction
 from typing import Any
 
 from torch.utils.data import Dataset, IterableDataset, get_worker_info
@@ -48,6 +49,35 @@ class ActionSFTDataset(Dataset):
         """Delegate to the inner DROIDLeRobotDataset (per-episode/segment flat-index blocks)."""
         return self._dataset.get_shuffle_blocks()
 
+    def get_shuffle_block_pools(self):
+        """Delegate ``(primary, replay)`` block pools; datasets without pools are all primary."""
+        if hasattr(self._dataset, "get_shuffle_block_pools"):
+            return self._dataset.get_shuffle_block_pools()
+        return self._dataset.get_shuffle_blocks(), []
+
+
+# Offset for the replay pool's permutation seed, so the primary pool keeps the
+# exact block order it has without replay.
+_REPLAY_SEED_OFFSET = 1_000_003
+
+
+def _block_stream(blocks, seed: int, shard: int, total_shards: int, share_if_empty: bool):
+    """Yield flat indices: shuffled block order per epoch, sequential within a block."""
+    import torch
+
+    epoch = 0
+    while True:
+        g = torch.Generator()
+        g.manual_seed(seed + epoch)  # same permutation across all (rank,worker) -> disjoint shard
+        order = torch.randperm(len(blocks), generator=g).tolist()
+        mine = order[shard::total_shards]
+        if not mine and share_if_empty:
+            mine = order
+        for b in mine:
+            start, length = blocks[b]
+            yield from range(start, start + length)
+        epoch += 1
+
 
 class ActionIterableShuffleDataset(IterableDataset):
     """Streaming view of a map-style ``ActionSFTDataset``.
@@ -60,12 +90,22 @@ class ActionIterableShuffleDataset(IterableDataset):
     Re-shuffles each epoch and streams indefinitely (the trainer stops at ``max_iter``).
 
     ``shard_world_size`` / ``shard_rank`` are set by ``RankPartitionedDataLoader``.
+
+    ``replay_fraction`` > 0 mixes in the dataset's replay pool (see
+    ``get_shuffle_block_pools``): every stream yields exactly that fraction of
+    replay windows, interleaved at a fixed cadence (0.2 -> one replay window
+    after every four primary windows). Each pool keeps its own shuffled,
+    sharded, sequential-within-block order and cycles independently. With the
+    default 0 only primary blocks are streamed, exactly as before.
     """
 
-    def __init__(self, dataset: "ActionSFTDataset", seed: int = 42):
+    def __init__(self, dataset: "ActionSFTDataset", seed: int = 42, replay_fraction: float = 0.0):
         super().__init__()
+        if not 0.0 <= float(replay_fraction) < 1.0:
+            raise ValueError(f"replay_fraction must be in [0, 1), got {replay_fraction}")
         self._dataset = dataset
         self._seed = int(seed)
+        self._replay_fraction = Fraction(float(replay_fraction)).limit_denominator(1000)
         self.shard_world_size = 1
         self.shard_rank = 0
 
@@ -75,7 +115,12 @@ class ActionIterableShuffleDataset(IterableDataset):
     def __iter__(self):
         import torch
 
+        if self._replay_fraction:
+            yield from self._iter_with_replay()
+            return
         blocks = self._dataset.get_shuffle_blocks()
+        if hasattr(self._dataset, "get_shuffle_block_pools"):
+            blocks = self._dataset.get_shuffle_block_pools()[0]
         wi = get_worker_info()
         wid = wi.id if wi is not None else 0
         nw = wi.num_workers if wi is not None else 1
@@ -91,6 +136,32 @@ class ActionIterableShuffleDataset(IterableDataset):
                 for idx in range(start, start + length):
                     yield self._dataset[idx]
             epoch += 1
+
+    def _iter_with_replay(self):
+        primary, replay = self._dataset.get_shuffle_block_pools()
+        if not primary or not replay:
+            raise ValueError(
+                f"replay_fraction={float(self._replay_fraction)} needs nonempty primary and replay pools; "
+                f"got {len(primary)} primary and {len(replay)} replay blocks (set replay_sources)"
+            )
+        wi = get_worker_info()
+        wid = wi.id if wi is not None else 0
+        nw = wi.num_workers if wi is not None else 1
+        global_shard = int(self.shard_rank) * nw + wid
+        total_shards = max(1, int(self.shard_world_size) * nw)
+        primary_ids = _block_stream(primary, self._seed, global_shard, total_shards, share_if_empty=False)
+        # A shard with no replay blocks of its own streams the full replay pool
+        # so its batches keep the requested mix.
+        replay_ids = _block_stream(
+            replay, self._seed + _REPLAY_SEED_OFFSET, global_shard, total_shards, share_if_empty=True
+        )
+        fraction = self._replay_fraction
+        count = 0
+        while True:
+            # Replay at sample n when floor((n + 1) f) > floor(n f): exact fraction, evenly spaced.
+            use_replay = (count + 1) * fraction // 1 > count * fraction // 1
+            count += 1
+            yield self._dataset[next(replay_ids) if use_replay else next(primary_ids)]
 
 
 def get_action_droid_sft_dataset(
@@ -122,12 +193,26 @@ def get_action_droid_sft_dataset(
     use_success_only: bool = True,
     split: str = "train",
     split_val_ratio: float = 0.03,
+    replay_sources: str | None = None,
+    replay_fraction: float = 0.0,
+    replay_padding_frames: int = 10,
 ) -> Dataset:
     """Build the DROID action SFT dataset: ``action_space='joint_pos'`` (8D) +
     ``use_state`` (raw/un-normalized), concat_view, chunk_length 32.
 
     Reads ``root`` (a merged/versioned DROID LeRobot root) as a single flat
-    dataset; ``use_success_only=True`` filters to the ``success/`` split."""
+    dataset; ``use_success_only=True`` filters to the ``success/`` split.
+
+    ``replay_sources`` (comma-separated action-source labels, e.g. ``"cosmos3"``)
+    adds a replay pool of windows starting in those ``source_intervals`` steps,
+    and ``replay_fraction`` sets its share of the training stream (0.2 = 1:4
+    replay to primary). Replay intervals are padded by ``replay_padding_frames``
+    on both sides, like the export's privileged intervals. Replay defaults off,
+    which keeps privileged-only starts."""
+    if replay_fraction and not replay_sources:
+        raise ValueError("replay_fraction > 0 requires replay_sources")
+    if replay_sources and iterable_shuffle and not replay_fraction:
+        raise ValueError("replay_sources needs replay_fraction > 0 for the training stream")
     shard_kwargs = dict(
         split=split,
         split_val_ratio=split_val_ratio,
@@ -144,6 +229,8 @@ def get_action_droid_sft_dataset(
         use_filter_dict=use_filter_dict,
         filter_dict_path=filter_dict_path,
         use_success_only=use_success_only,
+        replay_sources=replay_sources or None,
+        replay_padding_frames=replay_padding_frames,
     )
     dataset: Dataset = DROIDLeRobotDataset(root=root, **shard_kwargs)
     transform = ActionTransformPipeline(
@@ -158,7 +245,7 @@ def get_action_droid_sft_dataset(
     )
     sft = ActionSFTDataset(dataset, transform, resolution)
     if iterable_shuffle:
-        return ActionIterableShuffleDataset(sft, seed=episode_shuffle_seed)
+        return ActionIterableShuffleDataset(sft, seed=episode_shuffle_seed, replay_fraction=replay_fraction)
     return sft
 
 

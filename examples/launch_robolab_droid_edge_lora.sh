@@ -32,6 +32,14 @@ if [[ ! "$PER_DEVICE_BATCH" =~ ^(1|2|4|8|16|32|64)$ ]] || (( GLOBAL_BATCH % (2 *
     exit 2
 fi
 ACCUMULATION=$((GLOBAL_BATCH / (2 * PER_DEVICE_BATCH)))
+# Optional Cosmos3-phase replay: also sample windows that start in steps the base
+# policy executed, at 1 replay : 4 privileged-phase windows by default.
+COSMOS3_REPLAY="${COSMOS_DROID_COSMOS3_REPLAY:-0}"
+REPLAY_FRACTION="${COSMOS_DROID_REPLAY_FRACTION:-0.2}"
+if [[ "$COSMOS3_REPLAY" != 0 && "$COSMOS3_REPLAY" != 1 ]]; then
+    echo "COSMOS_DROID_COSMOS3_REPLAY must be 0 or 1." >&2
+    exit 2
+fi
 EXTRA_ARGS=()
 TAIL_OVERRIDES=("dataloader_train.max_samples_per_batch=$PER_DEVICE_BATCH" "trainer.grad_accum_iter=$ACCUMULATION")
 PROVENANCE="$DROID_ROOT/../provenance.json"
@@ -57,9 +65,19 @@ if plan.get('start_range_column') == 'training_start_ranges':
     print(steps)
 PY
 )"
+if [[ "$COSMOS3_REPLAY" == 1 && -z "$PHASE_STEPS" ]]; then
+    echo "COSMOS_DROID_COSMOS3_REPLAY=1 requires the privileged-phase export (training_start_ranges)." >&2
+    exit 2
+fi
 if [[ -n "$PHASE_STEPS" ]]; then
     PHASE_WARMUP=$(((PHASE_STEPS + 10) / 20))
-    TAIL_OVERRIDES+=("job.name=privileged_phases" "trainer.max_iter=$PHASE_STEPS"
+    PHASE_JOB=privileged_phases
+    if [[ "$COSMOS3_REPLAY" == 1 ]]; then
+        PHASE_JOB=privileged_phases_cosmos3_replay
+        TAIL_OVERRIDES+=("dataloader_train.dataloader.datasets.droid.dataset.replay_sources=cosmos3"
+            "dataloader_train.dataloader.datasets.droid.dataset.replay_fraction=$REPLAY_FRACTION")
+    fi
+    TAIL_OVERRIDES+=("job.name=$PHASE_JOB" "trainer.max_iter=$PHASE_STEPS"
         "scheduler.cycle_lengths=[$PHASE_STEPS]" "scheduler.warm_up_steps=[$PHASE_WARMUP]")
 fi
 IN_TAIL=false
@@ -79,10 +97,11 @@ if ! "$PYTHON" -c 'import transformer_engine.pytorch; from cosmos_framework.util
     echo 'Optimizer extension unavailable. Run: .venv/bin/python -m cosmos_framework.scripts.prepare_robolab_optimizer' >&2
     exit 2
 fi
-"$PYTHON" - "$PROVENANCE" "$COSMOS_DROID_CONDITIONING" <<'PY'
+"$PYTHON" - "$PROVENANCE" "$COSMOS_DROID_CONDITIONING" "$COSMOS3_REPLAY" "$DROID_ROOT" <<'PY'
 import json,sys
 from pathlib import Path
 provenance=json.loads(Path(sys.argv[1]).read_text())
+replay=sys.argv[3] == '1'
 phase_training=provenance.get('start_range_column') == 'training_start_ranges'
 expected_dataset_tasks=6 if phase_training else 8
 assert len(provenance['counts']) == expected_dataset_tasks and set(provenance['counts'].values()) == {25}, 'Need 25 successful demos per dataset task'
@@ -92,6 +111,23 @@ assert cache.exists() and json.loads(cache.read_text())['complete'], 'Precompute
 if phase_training:
     prompts=json.loads((cache.parent/'prompts.json').read_text())
     expected={text.strip().rstrip('.') for text in provenance['training_instructions']}
+    if replay:
+        # Replay windows add tasks with no privileged phase (Canned Food, Toy).
+        import pyarrow.parquet as pq
+
+        from cosmos_framework.data.generator.action.datasets.cosmos3_action_lerobot import (
+            build_episode_spans,
+            replay_start_ranges,
+        )
+
+        for path in sorted((Path(sys.argv[4])/'success/meta/episodes').glob('*/*.parquet')):
+            meta=pq.read_table(path).to_pydict()
+            ids=list(range(len(meta['length'])))
+            meta['dataset_from_index']=[0]*len(ids)
+            meta['dataset_to_index']=meta['length']
+            spans,_,_=build_episode_spans(meta, ids, chunk_length=32,
+                                          start_ranges=replay_start_ranges(meta, ids, ['cosmos3'], padding=10))
+            expected|={meta['tasks'][eid][0].strip().rstrip('.') for eid,_,_ in spans}
     actual={text.strip().rstrip('.') for text in prompts['task_instructions']}
     assert actual == expected, 'Conditioning cache must match the sampled tasks'
 PY

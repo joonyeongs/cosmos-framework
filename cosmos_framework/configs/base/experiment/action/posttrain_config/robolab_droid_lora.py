@@ -69,6 +69,10 @@ dataset.split_val_ratio = 0.0
 dataset.use_success_only = True
 dataset.use_image_augmentation = True
 dataset.use_color_augmentation = False
+# Optional Cosmos3-phase replay for privileged-phase training (off by default;
+# examples/launch_robolab_droid_edge_lora.sh enables it with COSMOS_DROID_COSMOS3_REPLAY=1).
+dataset.replay_sources = None
+dataset.replay_fraction = 0.0
 r.trainer.callbacks.robolab_training_audit = L(RoboLabTrainingAudit)()
 if os.environ.get("COSMOS_DROID_PROFILE") == "1":
     from cosmos_framework.callbacks.robolab_phase_profile import RoboLabPhaseProfile
